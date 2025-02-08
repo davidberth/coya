@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "C/C++: coya.exe",
+            "type": "lldb",
+            "console": "integratedTerminal",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/x64-debug/src/coya.exe",
+            "args": [],
+           
+            "cwd": "${workspaceFolder}",
+            "internalConsoleOptions": "neverOpen",
+        }
+    ]
+}

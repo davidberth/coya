@@ -1,0 +1,18 @@
+{
+    "terminal.integrated.fontSize": 10,
+    "folder-color.pathColors": [
+        {
+            "folderPath": "coya\\src\\core\\",
+            "color": "foldercolorizer.color_00cc66"
+        },
+        {
+            "folderPath": "coya\\src\\main.c\\",
+            "color": "foldercolorizer.color_cc2222"
+        }
+    ],
+    "clangd.fallbackFlags": [
+    "-I${workspaceFolder}/src",
+    "-I${workspaceFolder}/build/x64-Debug/src"
+    ],
+
+}
