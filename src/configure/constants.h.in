@@ -1,5 +1,6 @@
 #pragma once
 
-#cmakedefine APPNAME "${APPNAME}"
-#cmakedefine APPVERSION "${APPVERSION}"
-#cmakedefine RENDERER "${RENDERER}"
+#define APPNAME "@PROJECT_NAME@"
+#define APPVERSION "@PROJECT_VERSION@"
+#define RENDERER "@RENDERER@"
+#define PLATFORM "@PLATFORM@"

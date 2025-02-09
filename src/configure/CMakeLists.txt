@@ -1,1 +1,1 @@
-configure_file(constants.h.in constants.h)
+configure_file(constants.h.in constants.h @ONLY)

@@ -31,6 +31,16 @@ bool window_init(Window *window, int width, int height, char *title) {
     wc.hCursor = LoadCursor(NULL, IDC_CROSS);
     wc.lpszClassName = APPNAME;
 
+    HICON icon = (HICON)LoadImage(window->instance, "resources/icons/main.ico",
+                                  IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
+
+    if (!icon) {
+        elog("failed to load icon");
+        icon = LoadIcon(NULL, IDI_APPLICATION);
+    }
+
+    wc.hIcon = icon;
+
     if (!RegisterClassEx(&wc)) {
         elog("Failed to register window class");
         return false;
