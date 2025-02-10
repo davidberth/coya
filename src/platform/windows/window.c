@@ -88,3 +88,9 @@ void platform_poll_events() {
 }
 
 void platform_cleanup() { DestroyWindow(handle); }
+
+char *platform_get_current_directory() {
+    static char path[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH, path);
+    return path;
+}

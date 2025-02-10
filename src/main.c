@@ -22,6 +22,7 @@ int main() {
     elog("renderer: %s", RENDERER);
     wlog("platform: %s", PLATFORM);
     ilog("date: %s", BUILDDATE);
+    ilog("current directory: %s", platform_get_current_directory());
 
     if (!platform_init(1200, 800, get_window_title())) {
         elog("window initialization failed");
