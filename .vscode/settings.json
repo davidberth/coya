@@ -7,7 +7,19 @@
         },
         {
             "folderPath": "coya\\src\\main.c\\",
-            "color": "foldercolorizer.color_cc2222"
+            "color": "foldercolorizer.color_cc6600"
+        },
+        {
+            "folderPath": "coya\\src\\platform\\",
+            "color": "foldercolorizer.color_cc0033"
+        },
+        {
+            "folderPath": "coya\\src\\util\\",
+            "color": "foldercolorizer.color_00cccc"
+        },
+        {
+            "folderPath": "coya\\src\\configure\\",
+            "color": "foldercolorizer.color_cccc66"
         }
     ],
     "clangd.fallbackFlags": [

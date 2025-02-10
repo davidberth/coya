@@ -1,4 +1,5 @@
 ﻿#include "configure/constants.h"
+#include "core/event.h"
 #include "core/logger.h"
 #include "core/memory.h"
 #include "platform/platform.h"
@@ -13,6 +14,8 @@ char *get_window_title() {
              BUILDDATE, RENDERER, PLATFORM, BUILDTYPE);
     return title;
 }
+
+void on_keypress(EventContext event) { ilog("key pressed: %d", event.uint[0]); }
 
 int main() {
     init_logger();
@@ -29,6 +32,8 @@ int main() {
         elog("window initialization failed");
         return 1;
     }
+
+    register_event_handler(EVENT_TYPE_KEYBOARD, on_keypress);
 
     while (!platform_should_close()) {
         platform_poll_events();
