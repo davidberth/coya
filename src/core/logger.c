@@ -1,4 +1,5 @@
 #include "logger.h"
+#include <string.h>
 #include <sys\timeb.h>
 
 static struct timeb start;
@@ -19,7 +20,10 @@ void log_message(log_level level, const char *message, const char *file,
         "\033[0;31m[ERROR]   ", "\033[0;31m[FATAL]   "};
     printf("%s", level_strings[level]);
 
-    printf("[%010.3f] %s:%04d:\t", time_difference, file, line);
+    size_t file_length = strlen(file);
+    const char *short_file = file_length > 16 ? file + file_length - 16 : file;
+
+    printf("[%010.3f] %s:%04d:\t", time_difference, short_file, line);
     vprintf(message, args);
     printf("\033[0m\n");
 

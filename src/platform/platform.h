@@ -5,4 +5,4 @@ void platform_poll_events();
 bool platform_should_close();
 void platform_cleanup();
 
-char *platform_get_current_directory();
+char *platform_set_to_root_directory();
