@@ -1,7 +1,10 @@
+
+file(GLOB platform_windows_sources "platform/windows/*.c")
+file(GLOB core_sources "core/*.c")
+set(all_c_sources main.c ${platform_windows_sources} ${core_sources})
+
 add_executable(coya
-    "main.c"
-    "platform/window.c"
-    "core/logger.c"
+    ${all_c_sources}
 )
 target_include_directories(coya 
     PUBLIC 

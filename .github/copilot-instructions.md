@@ -1,2 +1,1 @@
-Name all variables using snake case. Class names should use Pascal case.
-Start all code comments with a lower case letter do not use a punctuation mark at the end. 
+In c code (and include files), name all variables using snake case, class names should use Pascal case, and start all comments with a lower case and do not use a punctuation at the end. Prefer single line comments. 
