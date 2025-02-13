@@ -2,17 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "core/logger.h"
 #include "memory.h"
 
 // global array to track total bytes allocated per category
 static size_t memory_totals[MEMORY_CATEGORY_COUNT] = {0};
 
+static const char *memory_category_names[] = {
+    "Vulkan",
+    "Game",
+    "SceneGraph",
+};
+
 // allocate memory and store header before user pointer
 void *oalloc(size_t size, MemoryCategory category) {
     // allocate memory for header and user data
     size_t total_size = sizeof(Opointer) + size;
-    // allocate block; note: for simplicity we do not align beyond malloc
-    // guarantees
+
     void *block = malloc(total_size);
     if (!block) {
         // allocation failed so return nullptr
@@ -54,4 +60,20 @@ size_t get_total_allocated_memory() {
         total += memory_totals[i];
     }
     return total;
+}
+
+// log memory report
+void log_memory_report() {
+    dlog("Memory report:");
+    for (int i = 0; i < MEMORY_CATEGORY_COUNT; ++i) {
+        dlog(" %-12s: %zu bytes", memory_category_names[i], memory_totals[i]);
+    }
+    dlog(" Total       : %zu bytes", get_total_allocated_memory());
+}
+
+void memory_cleanup() {
+    log_memory_report();
+    if (get_total_allocated_memory() > 0) {
+        elog("Memory leak detected!");
+    }
 }

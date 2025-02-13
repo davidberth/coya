@@ -68,6 +68,7 @@ int main() {
     }
 
     platform_cleanup();
+    memory_cleanup();
     dlog("application shutdown");
     return 0;
 }

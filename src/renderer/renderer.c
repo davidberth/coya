@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <core/logger.h>
+#include <core/memory.h>
 #include <vulkan/vulkan.h>
 
 void init_vulkan() {
@@ -20,14 +20,14 @@ void init_vulkan() {
     vkEnumerateInstanceExtensionProperties(NULL, &extension_count, NULL);
 
     VkExtensionProperties *extensions =
-        malloc(sizeof(VkExtensionProperties) * extension_count);
+        oalloc(sizeof(VkExtensionProperties) * extension_count,
+               MEMORY_CATEGORY_VULKAN);
     vkEnumerateInstanceExtensionProperties(NULL, &extension_count, extensions);
 
-    printf("available extensions:\n");
+    ilog("available extensions:");
 
     for (uint32_t i = 0; i < extension_count; i++) {
-        printf("%s\n", extensions[i].extensionName);
+        ilog("%s", extensions[i].extensionName);
     }
-
-    free(extensions);
+    ofree(extensions);
 }

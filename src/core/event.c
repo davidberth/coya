@@ -23,10 +23,10 @@ void register_event_handler(EventType event_type, EventHandler handler) {
         // increment count for this event type
         event_handler_counts[event_type]++;
 
-        ilog("Registered event handler for event type %s",
+        ilog("registered event handler for event type %s",
              event_type_string[event_type]);
     } else {
-        flog("Cannot register event handler for event type %s. Maximum number "
+        flog("cannot register event handler for event type %s. Maximum number "
              "of event listeners reached.",
              event_type_string[event_type]);
     }
