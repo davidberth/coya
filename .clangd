@@ -2,5 +2,6 @@ CompileFlags:
   Add:
     - -std=c23
     - -I${workspaceFolder}/build/@build_config@/src
+    - -IC:/VulkanSDK/1.4.304.0/Include
 If:
   PathMatch: ".*\\.c$"

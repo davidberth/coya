@@ -2,7 +2,9 @@
 #include "core/event.h"
 #include "core/logger.h"
 #include "core/memory.h"
+#include "input/input.h"
 #include "platform/platform.h"
+#include "renderer/renderer.h"
 
 char *get_window_title() {
 #define TITLE_SIZE                                                             \
@@ -15,7 +17,25 @@ char *get_window_title() {
     return title;
 }
 
-void on_keypress(EventContext event) { ilog("key pressed: %d", event.uint[0]); }
+void on_mouse_button(EventContext context) {
+    ilog("mouse button: %d", context.uint[0]);
+}
+
+void on_mouse_move(EventContext context) {
+    ilog("mouse move: %d, %d", context.sint[0], context.sint[1]);
+}
+
+void on_resize(EventContext context) {
+    ilog("window resized: %d, %d", context.uint[0], context.uint[1]);
+}
+
+void on_input_down(EventContext context) {
+    ilog("input down: %d", context.uint[0]);
+}
+
+void on_input_up(EventContext context) {
+    ilog("input up: %d", context.uint[0]);
+}
 
 int main() {
     init_logger();
@@ -33,7 +53,15 @@ int main() {
         return 1;
     }
 
-    register_event_handler(EVENT_TYPE_KEYBOARD, on_keypress);
+    register_event_handler(EVENT_TYPE_MOUSE_BUTTON, on_mouse_button);
+    // register_event_handler(EVENT_TYPE_MOUSE_MOVE, on_mouse_move);
+    register_event_handler(EVENT_TYPE_RESIZE, on_resize);
+    register_event_handler(EVENT_TYPE_INPUT_DOWN, on_input_down);
+    register_event_handler(EVENT_TYPE_INPUT_UP, on_input_up);
+
+    input_init();
+
+    init_vulkan();
 
     while (!platform_should_close()) {
         platform_poll_events();

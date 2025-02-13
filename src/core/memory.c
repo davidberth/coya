@@ -15,8 +15,8 @@ void *oalloc(size_t size, MemoryCategory category) {
     // guarantees
     void *block = malloc(total_size);
     if (!block) {
-        // allocation failed so return null
-        return NULL;
+        // allocation failed so return nullptr
+        return nullptr;
     }
     // set header values
     Opointer *opointer_ptr = (Opointer *)block;

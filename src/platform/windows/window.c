@@ -1,9 +1,12 @@
 #include "configure/constants.h"
+#include "core/event.h"
 #include "core/logger.h"
 #include "platform/platform.h"
 #include <windows.h>
+#include <windowsx.h>
+#include <winuser.h>
 
-HWND handle = NULL;
+HWND handle = nullptr;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
                             LPARAM lParam) {
@@ -14,7 +17,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
+    case WM_SIZE:
+        EventContext context;
+        context.uint[0] = LOWORD(lParam);
+        context.uint[1] = HIWORD(lParam);
+        trigger_event(EVENT_TYPE_RESIZE, context);
+        return 0;
     }
+
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
@@ -24,8 +34,8 @@ bool platform_init(int width, int height, char *title) {
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.style = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc = WindowProc;
-    wc.hInstance = GetModuleHandle(NULL);
-    wc.hCursor = LoadCursor(NULL, IDC_CROSS);
+    wc.hInstance = GetModuleHandle(nullptr);
+    wc.hCursor = LoadCursor(nullptr, IDC_CROSS);
     wc.lpszClassName = APPNAME;
 
     HICON icon = (HICON)LoadImage(wc.hInstance, "resources/icons/main.ico",
@@ -33,7 +43,7 @@ bool platform_init(int width, int height, char *title) {
 
     if (!icon) {
         elog("failed to load icon");
-        icon = LoadIcon(NULL, IDI_APPLICATION);
+        icon = LoadIcon(nullptr, IDI_APPLICATION);
     }
 
     wc.hIcon = icon;
@@ -57,8 +67,8 @@ bool platform_init(int width, int height, char *title) {
         (screen_height - window_height) / 2; // compute center y position
 
     handle = CreateWindowEx(0, APPNAME, title, WS_OVERLAPPEDWINDOW, pos_x,
-                            pos_y, window_width, window_height, NULL, NULL,
-                            wc.hInstance, NULL);
+                            pos_y, window_width, window_height, nullptr,
+                            nullptr, wc.hInstance, nullptr);
     if (!handle) {
         elog("failed to create window");
         return false;
@@ -68,54 +78,53 @@ bool platform_init(int width, int height, char *title) {
     return true;
 }
 
-bool platform_should_close() { return handle == NULL; }
+bool platform_should_close() { return handle == nullptr; }
 
 void platform_poll_events() {
     MSG msg;
-    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+    while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
         if (msg.message == WM_QUIT) {
-            handle = NULL;
+            handle = nullptr;
             return;
-        }
-        if (msg.message == WM_KEYDOWN) {
+        } else if (msg.message == WM_KEYDOWN) {
+            // check if key down event is a repeat
+            if (msg.lParam & (1 << 30))
+                break;
+            EventContext context;
+            context.uint[0] = msg.wParam;
+
+            trigger_event(EVENT_TYPE_KEY_DOWN, context);
             if (msg.wParam == VK_ESCAPE) {
-                handle = NULL;
+                handle = nullptr;
                 return;
             }
+        } else if (msg.message == WM_KEYUP) {
+            EventContext context;
+            context.uint[0] = msg.wParam;
+            trigger_event(EVENT_TYPE_KEY_UP, context);
+        } else if (msg.message == WM_LBUTTONDOWN) {
+            EventContext context;
+            context.uint[0] = 0; // left mouse button
+            trigger_event(EVENT_TYPE_MOUSE_BUTTON, context);
+        } else if (msg.message == WM_RBUTTONDOWN) {
+            EventContext context;
+            context.uint[0] = 1; // right mouse button
+            trigger_event(EVENT_TYPE_MOUSE_BUTTON, context);
+        } else if (msg.message == WM_MOUSEMOVE) {
+            EventContext context;
+            context.sint[0] = GET_X_LPARAM(msg.lParam);
+            context.sint[1] = GET_Y_LPARAM(msg.lParam);
+
+            trigger_event(EVENT_TYPE_MOUSE_MOVE, context);
+        } else if (msg.message == WM_MOUSEWHEEL) {
+            EventContext context;
+            context.sint[0] = GET_WHEEL_DELTA_WPARAM(msg.wParam);
+            trigger_event(EVENT_TYPE_MOUSE_SCROLL, context);
         }
+
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
 }
 
 void platform_cleanup() { DestroyWindow(handle); }
-
-char *platform_set_to_root_directory() {
-
-    static char current_directory[MAX_PATH];
-    // get current working directory
-    if (GetCurrentDirectory(MAX_PATH, current_directory)) {
-        size_t dir_length = strlen(current_directory);
-        // check if current directory ends with "src"
-        if (dir_length >= 3 &&
-            strcmp(current_directory + dir_length - 3, "src") == 0) {
-            int count = 0;
-            char *last_slash = NULL;
-            // remove last 3 directories
-            while (count < 3) {
-                last_slash = strrchr(current_directory, '\\');
-                if (last_slash == NULL) {
-                    break;
-                }
-                *last_slash = '\0';
-                count++;
-            }
-            // change current directory
-            SetCurrentDirectory(current_directory);
-            ilog("navigated to root directory: %s", current_directory);
-            GetCurrentDirectory(MAX_PATH, current_directory);
-        }
-    }
-
-    return current_directory;
-}

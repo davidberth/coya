@@ -18,27 +18,27 @@ Bitmap *read_bitmap(const char *path) {
     fopen_s(&file, path, "rb");
     if (!file) {
         elog("failed to open bitmap file");
-        return NULL;
+        return nullptr;
     }
     // read the bitmap file header
     BITMAPFILEHEADER file_header;
     if (fread(&file_header, sizeof(BITMAPFILEHEADER), 1, file) != 1) {
         elog("failed to read bitmap file header");
         fclose(file);
-        return NULL;
+        return nullptr;
     }
     // check that the file is a valid bitmap
     if (file_header.bfType != 0x4d42) {
         elog("file is not a valid bitmap");
         fclose(file);
-        return NULL;
+        return nullptr;
     }
     // read the bitmap info header
     BITMAPINFOHEADER info_header;
     if (fread(&info_header, sizeof(BITMAPINFOHEADER), 1, file) != 1) {
         elog("failed to read bitmap info header");
         fclose(file);
-        return NULL;
+        return nullptr;
     }
     // calculate image size if not provided
     int image_size = info_header.biSizeImage;
@@ -52,7 +52,7 @@ Bitmap *read_bitmap(const char *path) {
     if (!data) {
         elog("failed to allocate memory for bitmap data");
         fclose(file);
-        return NULL;
+        return nullptr;
     }
     // move file pointer to pixel data offset
     fseek(file, file_header.bfOffBits, SEEK_SET);
@@ -61,7 +61,7 @@ Bitmap *read_bitmap(const char *path) {
         elog("failed to read bitmap pixel data");
         free(data);
         fclose(file);
-        return NULL;
+        return nullptr;
     }
     // close the file
     fclose(file);
@@ -70,7 +70,7 @@ Bitmap *read_bitmap(const char *path) {
     if (!bitmap) {
         elog("failed to allocate memory for Bitmap structure");
         free(data);
-        return NULL;
+        return nullptr;
     }
     // set bitmap width
     bitmap->width = info_header.biWidth;
@@ -86,7 +86,7 @@ Bitmap *read_bitmap(const char *path) {
 
 // free the allocated bitmap
 void free_bitmap(Bitmap *bitmap) {
-    // check if bitmap is not null
+    // check if bitmap is not nullptr
     if (bitmap) {
         // free the bitmap data
         free(bitmap->data);
