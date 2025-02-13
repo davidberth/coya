@@ -1,6 +1,4 @@
 CompileFlags:  
   Add:
-    - -I${workspaceFolder}/build/@build_config@/src
-    - -IC:/VulkanSDK/1.4.304.0/Include
     - -Wall
     - -std=c23

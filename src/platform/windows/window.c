@@ -74,6 +74,14 @@ bool platform_init(int width, int height, char *title) {
         return false;
     }
 
+    HDC device_context = GetDC(handle); // get device context
+    RECT client_rect;
+    GetClientRect(handle, &client_rect); // get client area rectangle
+    HBRUSH black_brush =
+        (HBRUSH)GetStockObject(BLACK_BRUSH); // get stock black brush
+    FillRect(device_context, &client_rect,
+             black_brush);             // fill rectangle with black
+    ReleaseDC(handle, device_context); // release device context
     ShowWindow(handle, SW_SHOW);
     return true;
 }

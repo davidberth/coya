@@ -1,6 +1,7 @@
 ﻿cmake_minimum_required (VERSION 3.30)
 project (Coya LANGUAGES C VERSION 0.1.0)
 set(CMAKE_C_STANDARD 23)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # variables
 set(RENDERER "Vulkan")
@@ -14,3 +15,10 @@ find_package(Vulkan REQUIRED)
 
 # add the source directories
 add_subdirectory(src)
+
+add_custom_target(copy_compile_commands ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    ${CMAKE_BINARY_DIR}/compile_commands.json
+                    ${CMAKE_BINARY_DIR}/../compile_commands.json
+    COMMENT "copy compile_commands.json for clangd"
+)
