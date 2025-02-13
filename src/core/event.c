@@ -6,7 +6,7 @@ const char *event_type_string[] = {"Key Down",   "Key Up",       "Mouse Button",
                                    "Input Down", "Input Up",     "Input Zoom"};
 
 // global event manager arrays to store event listeners for each event type
-static EventHandler event_handler[EVENT_TYPE_COUNT][MAX_EVENTS] = {0};
+static EventHandler event_handler[EVENT_TYPE_COUNT][max_events] = {0};
 // array of count of event listeners registered per event type
 static unsigned int event_handler_counts[EVENT_TYPE_COUNT] = {0};
 
@@ -17,7 +17,7 @@ void register_event_handler(EventType event_type, EventHandler handler) {
         return;
     }
     // if there is space to register a new handler
-    if (event_handler_counts[event_type] < MAX_EVENTS) {
+    if (event_handler_counts[event_type] < max_events) {
         // add new event listener
         event_handler[event_type][event_handler_counts[event_type]] = handler;
         // increment count for this event type
