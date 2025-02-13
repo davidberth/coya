@@ -1,7 +1,7 @@
 #pragma once
 
 // maximum number of events per type
-#define MAX_EVENTS 5
+constexpr unsigned int max_events = 5;
 
 // define event types
 typedef enum EventType {
