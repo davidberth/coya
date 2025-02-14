@@ -48,7 +48,7 @@ int main() {
     char *root_directory = platform_set_to_root_directory();
     ilog("current directory: %s", root_directory);
 
-    if (!platform_init(1200, 800, get_window_title())) {
+    if (!platform_init(1000, 600, get_window_title())) {
         elog("window initialization failed");
         return 1;
     }
@@ -61,7 +61,9 @@ int main() {
 
     input_init();
 
-    init_vulkan();
+    if (!init_renderer()) {
+        return 1;
+    }
 
     while (!platform_should_close()) {
         platform_poll_events();

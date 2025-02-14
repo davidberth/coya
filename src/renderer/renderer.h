@@ -1,1 +1,2 @@
-void init_vulkan();
+bool init_renderer();
+void cleanup_renderer();

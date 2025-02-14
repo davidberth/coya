@@ -1,9 +1,13 @@
-
 file(GLOB core_sources "core/*.c")
-file(GLOB platform_windows_sources "platform/windows/*.c")
 file(GLOB input_sources "input/*.c")
-file(GLOB renderer_sources "renderer/*.c")
-set(all_c_sources main.c ${platform_windows_sources} ${core_sources} ${input_sources} ${renderer_sources})
+
+set(all_c_sources main.c ${core_sources} ${input_sources} ${renderer_sources})
+
+if(WIN32)
+    file(GLOB vulkan_sources "renderer/vulkan/*.c")
+    file(GLOB platform_windows_sources "platform/windows/*.c")
+    set(all_c_sources ${all_c_sources} ${vulkan_sources} ${platform_windows_sources})
+endif()
 
 add_executable(coya
     ${all_c_sources}

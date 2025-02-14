@@ -24,7 +24,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
         trigger_event(EVENT_TYPE_RESIZE, context);
         return 0;
     }
-
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
@@ -61,8 +60,9 @@ bool platform_init(int width, int height, char *title) {
     int window_width =
         temp_rect.right - temp_rect.left; // compute adjusted width
     int window_height =
-        temp_rect.bottom - temp_rect.top;          // compute adjusted height
-    int pos_x = (screen_width - window_width) / 2; // compute center x position
+        temp_rect.bottom - temp_rect.top; // compute adjusted height
+    // TODO: center window back to /2
+    int pos_x = (screen_width - window_width) / 22; // compute center x position
     int pos_y =
         (screen_height - window_height) / 2; // compute center y position
 
@@ -73,16 +73,8 @@ bool platform_init(int width, int height, char *title) {
         elog("failed to create window");
         return false;
     }
-
-    HDC device_context = GetDC(handle); // get device context
-    RECT client_rect;
-    GetClientRect(handle, &client_rect); // get client area rectangle
-    HBRUSH black_brush =
-        (HBRUSH)GetStockObject(BLACK_BRUSH); // get stock black brush
-    FillRect(device_context, &client_rect,
-             black_brush);             // fill rectangle with black
-    ReleaseDC(handle, device_context); // release device context
     ShowWindow(handle, SW_SHOW);
+
     return true;
 }
 

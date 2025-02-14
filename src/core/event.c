@@ -1,6 +1,8 @@
 #include "core/event.h"
 #include "core/logger.h"
 
+constexpr unsigned int max_events = 5;
+
 const char *event_type_string[] = {"Key Down",   "Key Up",       "Mouse Button",
                                    "Mouse Move", "Mouse Scroll", "Resize",
                                    "Input Down", "Input Up",     "Input Zoom"};
