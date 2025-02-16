@@ -7,7 +7,25 @@ extern VulkanContext vulkan_context;
 
 constexpr unsigned int max_extensions = 8;
 
-bool init_renderer() {
+VKAPI_ATTR VkBool32 VKAPI_CALL
+vk_debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
+                  VkDebugUtilsMessageTypeFlagsEXT message_type,
+                  const VkDebugUtilsMessengerCallbackDataEXT *callback_data,
+                  void *user_data) {
+
+    if (message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
+        elog("validation layer: %s", callback_data->pMessage);
+    } else if (message_severity >=
+               VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+        wlog("validation layer: %s", callback_data->pMessage);
+    } else {
+        dlog("validation layer: %s", callback_data->pMessage);
+    }
+
+    return VK_FALSE;
+}
+
+bool renderer_init() {
 
     VkApplicationInfo app_info = {VK_STRUCTURE_TYPE_APPLICATION_INFO};
     app_info.pApplicationName = "Coya";
@@ -50,7 +68,33 @@ bool init_renderer() {
 #endif
 
     vk_check(vkCreateInstance(&create_info, nullptr, &vulkan_context.instance));
+    dlog("vulkan instance created");
 
-    ilog("vulkan instance created");
+#if defined(_DEBUG)
+    unsigned int log_serverity =
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
+
+    VkDebugUtilsMessengerCreateInfoEXT debug_create_info = {
+        VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT};
+    debug_create_info.messageSeverity = log_serverity;
+    debug_create_info.messageType =
+        VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    debug_create_info.pfnUserCallback = vk_debug_callback;
+
+    PFN_vkCreateDebugUtilsMessengerEXT func =
+        (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+            vulkan_context.instance, "vkCreateDebugUtilsMessengerEXT");
+    vk_check(func(vulkan_context.instance, &debug_create_info, nullptr,
+                  &vulkan_context.debug_messenger));
+    dlog("vulkan debug messenger created");
+
+#endif
+
+    dlog("vulkan renderer initialized");
     return true;
 }

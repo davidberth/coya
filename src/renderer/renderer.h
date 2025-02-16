@@ -1,2 +1,2 @@
-bool init_renderer();
-void cleanup_renderer();
+bool renderer_init();
+void renderer_cleanup();

@@ -1,0 +1,22 @@
+#include "renderer/vulkan/context.h"
+#include "core/logger.h"
+#include <vulkan/vulkan_core.h>
+
+extern VulkanContext vulkan_context;
+
+void renderer_cleanup() {
+#if defined(_DEBUG)
+    dlog("cleaning up the vulkan debugger");
+    if (vulkan_context.debug_messenger) {
+
+        PFN_vkDestroyDebugUtilsMessengerEXT func =
+            (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+                vulkan_context.instance, "vkDestroyDebugUtilsMessengerEXT");
+
+        func(vulkan_context.instance, vulkan_context.debug_messenger, nullptr);
+    }
+#endif
+    dlog("cleaning up renderer");
+    vkDestroyInstance(vulkan_context.instance, nullptr);
+    dlog("vulkan instance destroyed");
+}

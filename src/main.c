@@ -61,7 +61,7 @@ int main() {
 
     input_init();
 
-    if (!init_renderer()) {
+    if (!renderer_init()) {
         return 1;
     }
 
@@ -69,6 +69,7 @@ int main() {
         platform_poll_events();
     }
 
+    renderer_cleanup();
     platform_cleanup();
     memory_cleanup();
     dlog("application shutdown");
