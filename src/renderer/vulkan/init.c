@@ -2,6 +2,7 @@
 #include "platform/util.h"
 #include "renderer/vulkan/context.h"
 #include "renderer/vulkan/util.h"
+#include "renderer/vulkan/device.h"
 
 extern VulkanContext vulkan_context;
 
@@ -73,9 +74,7 @@ bool renderer_init() {
 #if defined(_DEBUG)
     unsigned int log_serverity =
         VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
 
     VkDebugUtilsMessengerCreateInfoEXT debug_create_info = {
         VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT};
@@ -94,6 +93,13 @@ bool renderer_init() {
     dlog("vulkan debug messenger created");
 
 #endif
+
+    ilog("creating vulkan surface");
+    if (!vulkan_device_create()) {
+        elog("failed to create vulkan device");
+        return false;
+    }
+    ilog("vulkan surface created");
 
     dlog("vulkan renderer initialized");
     return true;

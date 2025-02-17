@@ -6,7 +6,8 @@
 #include <windowsx.h>
 #include <winuser.h>
 
-HWND handle = nullptr;
+HWND window_handle = nullptr;
+HINSTANCE window_hinstance = nullptr;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
                             LPARAM lParam) {
@@ -66,25 +67,28 @@ bool platform_init(int width, int height, char *title) {
     int pos_y =
         (screen_height - window_height) / 2; // compute center y position
 
-    handle = CreateWindowEx(0, APPNAME, title, WS_OVERLAPPEDWINDOW, pos_x,
-                            pos_y, window_width, window_height, nullptr,
-                            nullptr, wc.hInstance, nullptr);
-    if (!handle) {
+    window_handle = CreateWindowEx(0, APPNAME, title, WS_OVERLAPPEDWINDOW,
+                                   pos_x, pos_y, window_width, window_height,
+                                   nullptr, nullptr, wc.hInstance, nullptr);
+    if (!window_handle) {
         elog("failed to create window");
         return false;
     }
-    ShowWindow(handle, SW_SHOW);
+
+    // set our global hinstance variable
+    window_hinstance = wc.hInstance;
+    ShowWindow(window_handle, SW_SHOW);
 
     return true;
 }
 
-bool platform_should_close() { return handle == nullptr; }
+bool platform_should_close() { return window_handle == nullptr; }
 
 void platform_poll_events() {
     MSG msg;
     while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
         if (msg.message == WM_QUIT) {
-            handle = nullptr;
+            window_handle = nullptr;
             return;
         } else if (msg.message == WM_KEYDOWN) {
             // check if key down event is a repeat
@@ -95,7 +99,7 @@ void platform_poll_events() {
 
             trigger_event(EVENT_TYPE_KEY_DOWN, context);
             if (msg.wParam == VK_ESCAPE) {
-                handle = nullptr;
+                window_handle = nullptr;
                 return;
             }
         } else if (msg.message == WM_KEYUP) {
@@ -127,4 +131,4 @@ void platform_poll_events() {
     }
 }
 
-void platform_cleanup() { DestroyWindow(handle); }
+void platform_cleanup() { DestroyWindow(window_handle); }
