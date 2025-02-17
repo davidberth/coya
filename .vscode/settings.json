@@ -30,5 +30,8 @@
     "-I${workspaceFolder}/src",
     "-I${workspaceFolder}/build/x64-debug/src"
     ],
+    "cSpell.words": [
+        "elog"
+    ],
 
 }

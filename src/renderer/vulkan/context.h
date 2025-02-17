@@ -8,6 +8,14 @@ typedef struct {
 } VulkanDevice;
 
 typedef struct {
+    VkSurfaceCapabilitiesKHR capabilities;
+    unsigned int format_count;
+    VkSurfaceFormatKHR *formats;
+    unsigned int present_mode_count;
+    VkPresentModeKHR *present_modes;
+} VulkanSwapchainSupportInfo;
+
+typedef struct {
     VkInstance instance;
     VulkanDevice device;
     VkSurfaceKHR surface;

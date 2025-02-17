@@ -5,15 +5,12 @@
 
 extern VulkanContext vulkan_context;
 
-typedef struct phyiscal_device_requirements {
-    bool graphics;
-    bool present;
-    bool compute;
-    bool transfer;
-
-    const char **device_extension_names;
-    bool discrete_gpu;
-} PhysicalDeviceRequirements;
+typedef struct {
+    unsigned int graphics_family_index;
+    unsigned int present_family_index;
+    unsigned int compute_family_index;
+    unsigned int transfer_family_index;
+} VulkanPhysicalDeviceQueueFamilyInfo;
 
 bool select_physical_device() {
 
@@ -33,6 +30,32 @@ bool select_physical_device() {
 
     vk_check(vkEnumeratePhysicalDevices(
         vulkan_context.instance, &physical_device_count, physical_devices));
+
+    unsigned int selected_device_number = 0;
+    for (unsigned int i = 0; i < physical_device_count; i++) {
+        VkPhysicalDeviceProperties properties;
+        vkGetPhysicalDeviceProperties(physical_devices[i], &properties);
+
+        VkPhysicalDeviceFeatures features;
+        vkGetPhysicalDeviceFeatures(physical_devices[i], &features);
+        if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+            ilog("found discrete GPU: %s", properties.deviceName);
+            ilog("selecting this device");
+            selected_device_number = i;
+        } else if (properties.deviceType ==
+                   VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU) {
+            ilog("found integrated GPU: %s", properties.deviceName);
+        } else if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU) {
+            ilog("found CPU: %s", properties.deviceName);
+        } else if (properties.deviceType ==
+                   VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU) {
+            ilog("found virtual GPU: %s", properties.deviceName);
+        } else {
+            ilog("found unknown device type: %s", properties.deviceName);
+        }
+
+        ilog("device %d: %s", i, properties.deviceName);
+    }
 
     ofree(physical_devices);
     return true;
