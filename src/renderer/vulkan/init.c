@@ -42,7 +42,7 @@ bool renderer_init() {
     unsigned int extension_count = 0;
     get_vulkan_platform_extensions(extensions, &extension_count);
     extensions[extension_count++] = VK_KHR_SURFACE_EXTENSION_NAME;
-#if defined(F_DEBUGF)
+#if defined(_DEBUG)
     extensions[extension_count++] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
 #endif
 
@@ -54,7 +54,7 @@ bool renderer_init() {
     create_info.enabledExtensionCount = extension_count;
     create_info.ppEnabledExtensionNames = extensions;
 
-#if defined(F_DEBUGBVBVBV)
+#if defined(_DEBUG)
     ilog("validation layers enabled");
 
     const char *validation_layers[1];
@@ -71,7 +71,7 @@ bool renderer_init() {
     vk_check(vkCreateInstance(&create_info, nullptr, &vulkan_context.instance));
     ilog("vulkan instance created");
 
-#if defined(F_DEBUGVBVBVBV)
+#if defined(_DEBUG)
     unsigned int log_serverity =
         VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
         VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;

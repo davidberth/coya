@@ -166,6 +166,8 @@ bool create_logical_device() {
     if (!transfer_shares_graphics_queue)
         index_count++;
     unsigned int indices[index_count];
+
+    indices[index++] = vulkan_context.device.graphics_queue_index;
     if (!present_shares_graphics_queue)
         indices[index++] = vulkan_context.device.present_queue_index;
     if (!transfer_shares_graphics_queue)

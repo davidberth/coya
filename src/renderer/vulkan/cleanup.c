@@ -6,7 +6,7 @@
 extern VulkanContext vulkan_context;
 
 void renderer_cleanup() {
-#if defined(_DEBUGF)
+#if defined(_DEBUG)
     dlog("cleaning up the vulkan debugger");
     if (vulkan_context.debug_messenger) {
 
@@ -20,7 +20,13 @@ void renderer_cleanup() {
 
     dlog("cleaning up device");
     vulkan_device_cleanup();
-    dlog("cleaning up renderer");
+
+    dlog("cleaning up the surface");
+    if (vulkan_context.surface) {
+        vkDestroySurfaceKHR(vulkan_context.instance, vulkan_context.surface,
+                            nullptr);
+    }
+
     vkDestroyInstance(vulkan_context.instance, nullptr);
     dlog("vulkan instance destroyed");
 }

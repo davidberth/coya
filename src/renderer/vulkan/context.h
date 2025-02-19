@@ -29,12 +29,21 @@ typedef struct {
 } VulkanSwapchainSupportInfo;
 
 typedef struct {
+    VkSurfaceFormatKHR image_format;
+    unsigned int max_frames_in_flight;
+    VkSwapchainKHR handle;
+    unsigned int image_count;
+    VkImage *images;
+    VkImageView *views;
+} VulkanSwapchain;
+
+typedef struct {
     VkInstance instance;
     VulkanDevice device;
     VkSurfaceKHR surface;
     VkPhysicalDeviceProperties physical_device_properties;
     VkPhysicalDeviceFeatures physical_device_features;
-#if defined(_DEBUGF)
+#if defined(_DEBUG)
     VkDebugUtilsMessengerEXT debug_messenger;
 #endif
 } VulkanContext;
