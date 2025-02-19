@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan.h>
 
+// vulkan device
 typedef struct {
     VkPhysicalDevice physical_device;
     VkDevice logical_device;
@@ -17,9 +18,9 @@ typedef struct {
     VkQueue graphics_queue;
     VkQueue present_queue;
     VkQueue transfer_queue;
-
 } VulkanDevice;
 
+// swapchain support info
 typedef struct {
     VkSurfaceCapabilitiesKHR capabilities;
     unsigned int format_count;
@@ -28,6 +29,7 @@ typedef struct {
     VkPresentModeKHR *present_modes;
 } VulkanSwapchainSupportInfo;
 
+// swapchain
 typedef struct {
     VkSurfaceFormatKHR image_format;
     unsigned int max_frames_in_flight;
@@ -37,6 +39,7 @@ typedef struct {
     VkImageView *views;
 } VulkanSwapchain;
 
+// vulkan context
 typedef struct {
     VkInstance instance;
     VulkanDevice device;
