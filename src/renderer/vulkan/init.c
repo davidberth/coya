@@ -6,7 +6,7 @@
 
 extern VulkanContext vulkan_context;
 
-constexpr unsigned int max_extensions = 8;
+constexpr unsigned int max_extensions = 6;
 
 VKAPI_ATTR VkBool32 VKAPI_CALL
 vk_debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
@@ -42,7 +42,7 @@ bool renderer_init() {
     unsigned int extension_count = 0;
     get_vulkan_platform_extensions(extensions, &extension_count);
     extensions[extension_count++] = VK_KHR_SURFACE_EXTENSION_NAME;
-#if defined(_DEBUG)
+#if defined(F_DEBUGF)
     extensions[extension_count++] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
 #endif
 
@@ -54,8 +54,8 @@ bool renderer_init() {
     create_info.enabledExtensionCount = extension_count;
     create_info.ppEnabledExtensionNames = extensions;
 
-#if defined(_DEBUG)
-    ilog("Validation layers enabled");
+#if defined(F_DEBUGBVBVBV)
+    ilog("validation layers enabled");
 
     const char *validation_layers[1];
     validation_layers[0] = "VK_LAYER_KHRONOS_validation";
@@ -63,7 +63,7 @@ bool renderer_init() {
     create_info.enabledLayerCount = 1;
     create_info.ppEnabledLayerNames = validation_layers;
 #else
-    ilog("Validation layers disabled");
+    ilog("validation layers disabled");
     create_info.enabledLayerCount = 0;
     create_info.ppEnabledLayerNames = nullptr;
 #endif
@@ -71,7 +71,7 @@ bool renderer_init() {
     vk_check(vkCreateInstance(&create_info, nullptr, &vulkan_context.instance));
     dlog("vulkan instance created");
 
-#if defined(_DEBUG)
+#if defined(F_DEBUGVBVBVBV)
     unsigned int log_serverity =
         VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
         VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
@@ -95,6 +95,10 @@ bool renderer_init() {
 #endif
 
     ilog("creating vulkan surface");
+    if (!create_vulkan_surface()) {
+        elog("failed to create vulkan surface");
+        return false;
+    }
     if (!vulkan_device_create()) {
         elog("failed to create vulkan device");
         return false;

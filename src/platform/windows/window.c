@@ -62,8 +62,8 @@ bool platform_init(int width, int height, char *title) {
         temp_rect.right - temp_rect.left; // compute adjusted width
     int window_height =
         temp_rect.bottom - temp_rect.top; // compute adjusted height
-    // TODO: center window back to /2
-    int pos_x = (screen_width - window_width) / 22; // compute center x position
+
+    int pos_x = (screen_width - window_width) / 2; // compute center x position
     int pos_y =
         (screen_height - window_height) / 2; // compute center y position
 

@@ -64,7 +64,7 @@ size_t get_total_allocated_memory() {
 
 // log memory report
 void log_memory_report() {
-    dlog("Memory report:");
+    dlog("memory report:");
     for (int i = 0; i < MEMORY_CATEGORY_COUNT; ++i) {
         dlog(" %-12s: %zu bytes", memory_category_names[i], memory_totals[i]);
     }

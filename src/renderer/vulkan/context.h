@@ -5,6 +5,15 @@
 typedef struct {
     VkPhysicalDevice physical_device;
     VkDevice logical_device;
+    VkPhysicalDeviceProperties properties;
+    VkPhysicalDeviceFeatures features;
+    VkPhysicalDeviceMemoryProperties memory;
+
+    int graphics_queue_index;
+    int present_queue_index;
+    int transfer_queue_index;
+    int compute_queue_index;
+
 } VulkanDevice;
 
 typedef struct {
@@ -19,7 +28,9 @@ typedef struct {
     VkInstance instance;
     VulkanDevice device;
     VkSurfaceKHR surface;
-#if defined(_DEBUG)
+    VkPhysicalDeviceProperties physical_device_properties;
+    VkPhysicalDeviceFeatures physical_device_features;
+#if defined(_DEBUGF)
     VkDebugUtilsMessengerEXT debug_messenger;
 #endif
 } VulkanContext;

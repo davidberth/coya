@@ -1,11 +1,12 @@
 #include "renderer/vulkan/context.h"
 #include "core/logger.h"
+#include "renderer/vulkan/device.h"
 #include <vulkan/vulkan_core.h>
 
 extern VulkanContext vulkan_context;
 
 void renderer_cleanup() {
-#if defined(_DEBUG)
+#if defined(_DEBUGF)
     dlog("cleaning up the vulkan debugger");
     if (vulkan_context.debug_messenger) {
 
@@ -16,6 +17,9 @@ void renderer_cleanup() {
         func(vulkan_context.instance, vulkan_context.debug_messenger, nullptr);
     }
 #endif
+
+    dlog("cleaning up device");
+    vulkan_device_cleanup();
     dlog("cleaning up renderer");
     vkDestroyInstance(vulkan_context.instance, nullptr);
     dlog("vulkan instance destroyed");
