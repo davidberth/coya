@@ -69,7 +69,7 @@ bool renderer_init() {
 #endif
 
     vk_check(vkCreateInstance(&create_info, nullptr, &vulkan_context.instance));
-    dlog("vulkan instance created");
+    ilog("vulkan instance created");
 
 #if defined(F_DEBUGVBVBVBV)
     unsigned int log_serverity =

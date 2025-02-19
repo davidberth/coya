@@ -14,6 +14,10 @@ typedef struct {
     int transfer_queue_index;
     int compute_queue_index;
 
+    VkQueue graphics_queue;
+    VkQueue present_queue;
+    VkQueue transfer_queue;
+
 } VulkanDevice;
 
 typedef struct {

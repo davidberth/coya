@@ -146,14 +146,93 @@ bool select_physical_device() {
     ilog(" compute: %d", vulkan_context.device.compute_queue_index);
     ilog(" transfer: %d", vulkan_context.device.transfer_queue_index);
 
+    ilog("physical device selected");
+    return true;
+}
+
+bool create_logical_device() {
+    ilog("creating logical device");
+    bool present_shares_graphics_queue =
+        vulkan_context.device.graphics_queue_index ==
+        vulkan_context.device.present_queue_index;
+    bool transfer_shares_graphics_queue =
+        vulkan_context.device.graphics_queue_index ==
+        vulkan_context.device.transfer_queue_index;
+
+    unsigned int index_count = 1;
+    unsigned int index = 0;
+    if (!present_shares_graphics_queue)
+        index_count++;
+    if (!transfer_shares_graphics_queue)
+        index_count++;
+    unsigned int indices[index_count];
+    if (!present_shares_graphics_queue)
+        indices[index++] = vulkan_context.device.present_queue_index;
+    if (!transfer_shares_graphics_queue)
+        indices[index++] = vulkan_context.device.transfer_queue_index;
+
+    VkDeviceQueueCreateInfo queue_create_infos[index_count];
+    for (unsigned int i = 0; i < index_count; i++) {
+        queue_create_infos[i].sType =
+            VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queue_create_infos[i].queueFamilyIndex = indices[i];
+        queue_create_infos[i].queueCount = 1;
+        if (indices[i] == vulkan_context.device.graphics_queue_index) {
+            queue_create_infos[i].queueCount = 2;
+        }
+        queue_create_infos[i].flags = 0;
+        queue_create_infos[i].pNext = 0;
+        float queue_priority = 1.0f;
+        queue_create_infos[i].pQueuePriorities = &queue_priority;
+    }
+
+    VkPhysicalDeviceFeatures device_features = {};
+    device_features.samplerAnisotropy = VK_TRUE;
+
+    VkDeviceCreateInfo device_create_info = {
+        VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO};
+    device_create_info.queueCreateInfoCount = index_count;
+    device_create_info.pQueueCreateInfos = queue_create_infos;
+    device_create_info.pEnabledFeatures = &device_features;
+    device_create_info.enabledExtensionCount = 1;
+    const char *extension_names = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+    device_create_info.ppEnabledExtensionNames = &extension_names;
+
+    vk_check(vkCreateDevice(vulkan_context.device.physical_device,
+                            &device_create_info, nullptr,
+                            &vulkan_context.device.logical_device));
+
+    ilog("logical device created");
+
+    ilog("getting device queues");
+    vkGetDeviceQueue(vulkan_context.device.logical_device,
+                     vulkan_context.device.graphics_queue_index, 0,
+                     &vulkan_context.device.graphics_queue);
+
+    vkGetDeviceQueue(vulkan_context.device.logical_device,
+                     vulkan_context.device.present_queue_index, 0,
+                     &vulkan_context.device.present_queue);
+
+    vkGetDeviceQueue(vulkan_context.device.logical_device,
+                     vulkan_context.device.transfer_queue_index, 0,
+                     &vulkan_context.device.transfer_queue);
+    ilog("device queues retrieved");
+
     return true;
 }
 
 bool vulkan_device_create() {
     if (!select_physical_device())
         return false;
-    // if (!create_logical_device()) return false
+    if (!create_logical_device())
+        return false;
     return true;
 }
 
-void vulkan_device_cleanup() { ilog("cleaning up Vulkan"); }
+void vulkan_device_cleanup() {
+    ilog("cleaning up Vulkan");
+    vulkan_context.device.graphics_queue = 0;
+    vulkan_context.device.present_queue = 0;
+    vulkan_context.device.transfer_queue = 0;
+    vkDestroyDevice(vulkan_context.device.logical_device, nullptr);
+}
