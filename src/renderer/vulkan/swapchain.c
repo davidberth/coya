@@ -132,6 +132,11 @@ void create(unsigned width, unsigned height, VulkanSwapchain *swapchain) {
                                    &view_info, nullptr, &swapchain->views[i]));
     }
 
+    if (!vulkan_device_detect_depth_format()) {
+        vulkan_context.device.depth_format = VK_FORMAT_UNDEFINED;
+        flog("failed to fined supported depth format");
+    }
+
     ilog("swapchain created");
 }
 

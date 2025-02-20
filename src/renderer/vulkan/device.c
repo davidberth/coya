@@ -1,6 +1,7 @@
 #include "renderer/vulkan/device.h"
 #include "core/logger.h"
 #include "core/memory.h"
+#include "device.h"
 #include "renderer/vulkan/util.h"
 #include "renderer/vulkan/context.h"
 
@@ -45,6 +46,28 @@ void vulkan_device_query_swapchain_support() {
             &vulkan_context.device.swapchain_support.present_mode_count,
             vulkan_context.device.swapchain_support.present_modes));
     }
+}
+
+bool vulkan_device_detect_depth_format() {
+    constexpr unsigned int candidate_count = 3;
+    VkFormat candidates[candidate_count] = {VK_FORMAT_D32_SFLOAT,
+                                            VK_FORMAT_D32_SFLOAT_S8_UINT,
+                                            VK_FORMAT_D24_UNORM_S8_UINT};
+
+    unsigned int flags = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
+    for (unsigned int i = 0; i < candidate_count; i++) {
+        VkFormatProperties props;
+        vkGetPhysicalDeviceFormatProperties(
+            vulkan_context.device.physical_device, candidates[i], &props);
+        if ((props.optimalTilingFeatures & flags) == flags) {
+            vulkan_context.device.depth_format = candidates[i];
+            return true;
+        } else if ((props.optimalTilingFeatures & flags) == flags) {
+            vulkan_context.device.depth_format = candidates[i];
+            return true;
+        }
+    }
+    return false;
 }
 
 bool select_physical_device() {

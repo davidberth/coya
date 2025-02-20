@@ -1,0 +1,23 @@
+#pragma once
+
+#include "renderer/vulkan/context.h"
+
+typedef struct {
+    VkImage handle;
+    VkDeviceMemory memory;
+    VkImageView view;
+    unsigned int width;
+    unsigned int height;
+} VulkanImage;
+
+void vulkan_image_create(VkImageType image_type, unsigned int width,
+                         unsigned int height, VkFormat format,
+                         VkImageTiling tiling, VkImageUsageFlags usage,
+                         VkMemoryPropertyFlags memory_flags, bool create_view,
+                         VkImageAspectFlags view_aspect_flags,
+                         VulkanImage *out_image);
+
+void vulkan_image_view_create(VkFormat format, VulkanImage *image,
+                              VkImageAspectFlags aspect_flags);
+
+void vulkan_image_destroy(VulkanImage *image);

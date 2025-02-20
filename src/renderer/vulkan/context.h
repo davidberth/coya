@@ -21,6 +21,8 @@ typedef struct {
 
     VulkanSwapchainSupportInfo swapchain_support;
 
+    VkFormat depth_format; 
+
     int graphics_queue_index;
     int present_queue_index;
     int transfer_queue_index;
