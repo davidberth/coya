@@ -6,12 +6,46 @@
 
 extern VulkanContext vulkan_context;
 
-typedef struct {
-    unsigned int graphics_family_index;
-    unsigned int present_family_index;
-    unsigned int compute_family_index;
-    unsigned int transfer_family_index;
-} VulkanPhysicalDeviceQueueFamilyInfo;
+void vulkan_device_query_swapchain_support() {
+    ilog("getting swapchain support info");
+    vk_check(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+        vulkan_context.device.physical_device, vulkan_context.surface,
+        &vulkan_context.device.swapchain_support.capabilities));
+
+    vk_check(vkGetPhysicalDeviceSurfaceFormatsKHR(
+        vulkan_context.device.physical_device, vulkan_context.surface,
+        &vulkan_context.device.swapchain_support.format_count, nullptr));
+
+    if (vulkan_context.device.swapchain_support.format_count != 0) {
+        vulkan_context.device.swapchain_support.formats =
+            (VkSurfaceFormatKHR *)oalloc(
+                sizeof(VkSurfaceFormatKHR) *
+                    vulkan_context.device.swapchain_support.format_count,
+                MEMORY_CATEGORY_VULKAN);
+
+        vk_check(vkGetPhysicalDeviceSurfaceFormatsKHR(
+            vulkan_context.device.physical_device, vulkan_context.surface,
+            &vulkan_context.device.swapchain_support.format_count,
+            vulkan_context.device.swapchain_support.formats));
+    }
+
+    vk_check(vkGetPhysicalDeviceSurfacePresentModesKHR(
+        vulkan_context.device.physical_device, vulkan_context.surface,
+        &vulkan_context.device.swapchain_support.present_mode_count, nullptr));
+
+    if (vulkan_context.device.swapchain_support.present_mode_count != 0) {
+        vulkan_context.device.swapchain_support.present_modes =
+            (VkPresentModeKHR *)oalloc(
+                sizeof(VkPresentModeKHR) *
+                    vulkan_context.device.swapchain_support.present_mode_count,
+                MEMORY_CATEGORY_VULKAN);
+
+        vk_check(vkGetPhysicalDeviceSurfacePresentModesKHR(
+            vulkan_context.device.physical_device, vulkan_context.surface,
+            &vulkan_context.device.swapchain_support.present_mode_count,
+            vulkan_context.device.swapchain_support.present_modes));
+    }
+}
 
 bool select_physical_device() {
 
@@ -145,6 +179,8 @@ bool select_physical_device() {
     ilog(" present: %d", vulkan_context.device.present_queue_index);
     ilog(" compute: %d", vulkan_context.device.compute_queue_index);
     ilog(" transfer: %d", vulkan_context.device.transfer_queue_index);
+
+    vulkan_device_query_swapchain_support();
 
     ilog("physical device selected");
     return true;
