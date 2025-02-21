@@ -1,8 +1,8 @@
-#include "renderer/vulkan/types.h"
 #include "core/logger.h"
-#include "core/memory.h"
+#include "renderer/vulkan/types.h"
 #include "renderer/vulkan/device.h"
 #include "renderer/vulkan/swapchain.h"
+#include "renderer/vulkan/renderpass.h"
 #include <vulkan/vulkan_core.h>
 
 extern VulkanContext vulkan_context;
@@ -13,13 +13,16 @@ void renderer_cleanup() {
     if (vulkan_context.debug_messenger) {
 
         PFN_vkDestroyDebugUtilsMessengerEXT func =
-            (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-                vulkan_context.instance, "vkDestroyDebugUtilsMessengerEXT");
+          (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+            vulkan_context.instance, "vkDestroyDebugUtilsMessengerEXT");
 
         func(vulkan_context.instance, vulkan_context.debug_messenger,
-             vulkan_context.allocator);
+          vulkan_context.allocator);
     }
 #endif
+
+    ilog("clearning up the main renderpass");
+    vulkan_renderpass_destroy(&vulkan_context.main_renderpass);
 
     ilog("cleaning up the swapchain");
     vulkan_swapchain_destroy(&vulkan_context.swapchain);
@@ -30,7 +33,7 @@ void renderer_cleanup() {
     ilog("cleaning up the surface");
     if (vulkan_context.surface) {
         vkDestroySurfaceKHR(vulkan_context.instance, vulkan_context.surface,
-                            vulkan_context.allocator);
+          vulkan_context.allocator);
     }
 
     vkDestroyInstance(vulkan_context.instance, vulkan_context.allocator);

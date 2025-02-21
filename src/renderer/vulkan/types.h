@@ -11,6 +11,26 @@ typedef struct {
     unsigned int height;
 } VulkanImage;
 
+typedef enum {
+    READY,
+    RECORDING,
+    IN_RENDER_PASS,
+    RECORDING_ENDED,
+    SUBMITTED,
+    NOT_ALLOCATED
+} VulkanRenderPassState;
+
+typedef struct {
+    VkRenderPass handle;
+    float x, y, w, h;
+    float r, g, b, a;
+
+    float depth;
+    unsigned int stencil;
+
+    VulkanRenderPassState state;
+} VulkanRenderpass;
+
 // swapchain support info
 typedef struct {
     VkSurfaceCapabilitiesKHR capabilities;
@@ -54,6 +74,20 @@ typedef struct {
     VulkanImage depth_attachment;
 } VulkanSwapchain;
 
+typedef enum {
+    COMMAND_BUFFER_STATE_READY,
+    COMMAND_BUFFER_STATE_RECORDING,
+    COMMAND_BUFFER_STATE_IN_RENDER_PASS,
+    COMMAND_BUFFER_STATE_RECORDING_ENDED,
+    COMMAND_BUFFER_STATE_SUBMITTED,
+    COMMAND_BUFFER_STATE_NOT_ALLOCATED
+} VulkanCommandBufferState;
+
+typedef struct {
+    VkCommandBuffer handle;
+    VulkanCommandBufferState state;
+} VulkanCommandBuffer;
+
 // vulkan context
 typedef struct {
     unsigned int framebuffer_width;
@@ -70,9 +104,10 @@ typedef struct {
     unsigned int current_frame;
 
     bool recreating_swapchain;
+    VulkanRenderpass main_renderpass;
 
-    int (*find_memory_index)(unsigned int type_filter,
-                             unsigned int property_flags);
+    int (*find_memory_index)(
+      unsigned int type_filter, unsigned int property_flags);
 
 #if defined(_DEBUG)
     VkDebugUtilsMessengerEXT debug_messenger;

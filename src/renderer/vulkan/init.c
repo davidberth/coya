@@ -4,16 +4,16 @@
 #include "renderer/vulkan/util.h"
 #include "renderer/vulkan/device.h"
 #include "renderer/vulkan/swapchain.h"
+#include "renderer/vulkan/renderpass.h"
 
 extern VulkanContext vulkan_context;
 
 constexpr unsigned int max_extensions = 6;
 
-VKAPI_ATTR VkBool32 VKAPI_CALL
-vk_debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
-                  VkDebugUtilsMessageTypeFlagsEXT message_type,
-                  const VkDebugUtilsMessengerCallbackDataEXT *callback_data,
-                  void *user_data) {
+VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_callback(
+  VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
+  VkDebugUtilsMessageTypeFlagsEXT message_type,
+  const VkDebugUtilsMessengerCallbackDataEXT *callback_data, void *user_data) {
 
     if (message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
         elog("validation layer: %s", callback_data->pMessage);
@@ -29,13 +29,13 @@ vk_debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
 
 int find_memory_index(unsigned int type_filter, unsigned int property_flags) {
     VkPhysicalDeviceMemoryProperties memory_properties;
-    vkGetPhysicalDeviceMemoryProperties(vulkan_context.device.physical_device,
-                                        &memory_properties);
+    vkGetPhysicalDeviceMemoryProperties(
+      vulkan_context.device.physical_device, &memory_properties);
 
     for (unsigned int i = 0; i < memory_properties.memoryTypeCount; i++) {
         if ((type_filter & (1 << i)) &&
             (memory_properties.memoryTypes[i].propertyFlags & property_flags) ==
-                property_flags) {
+              property_flags) {
             return i;
         }
     }
@@ -89,29 +89,29 @@ bool renderer_init() {
     create_info.ppEnabledLayerNames = nullptr;
 #endif
 
-    vk_check(vkCreateInstance(&create_info, vulkan_context.allocator,
-                              &vulkan_context.instance));
+    vk_check(vkCreateInstance(
+      &create_info, vulkan_context.allocator, &vulkan_context.instance));
     ilog("vulkan instance created");
 
 #if defined(_DEBUG)
     unsigned int log_serverity =
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
+      VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
+      VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
 
     VkDebugUtilsMessengerCreateInfoEXT debug_create_info = {
-        VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT};
+      VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT};
     debug_create_info.messageSeverity = log_serverity;
     debug_create_info.messageType =
-        VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-        VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+      VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+      VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+      VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     debug_create_info.pfnUserCallback = vk_debug_callback;
 
     PFN_vkCreateDebugUtilsMessengerEXT func =
-        (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-            vulkan_context.instance, "vkCreateDebugUtilsMessengerEXT");
+      (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+        vulkan_context.instance, "vkCreateDebugUtilsMessengerEXT");
     vk_check(func(vulkan_context.instance, &debug_create_info,
-                  vulkan_context.allocator, &vulkan_context.debug_messenger));
+      vulkan_context.allocator, &vulkan_context.debug_messenger));
     dlog("vulkan debug messenger created");
 
 #endif
@@ -128,8 +128,12 @@ bool renderer_init() {
     }
 
     vulkan_swapchain_create(vulkan_context.framebuffer_width,
-                            vulkan_context.framebuffer_height,
-                            &vulkan_context.swapchain);
+      vulkan_context.framebuffer_height, &vulkan_context.swapchain);
+
+    ilog("creating renderpass");
+    vulkan_renderpass_create(&vulkan_context.main_renderpass, 0.0f, 0.0f,
+      vulkan_context.framebuffer_width, vulkan_context.framebuffer_height, 0.0f,
+      0.0f, 0.2f, 1.0f, 1.0f, 0);
 
     ilog("vulkan renderer initialized");
     return true;
