@@ -297,4 +297,7 @@ void vulkan_device_cleanup() {
     vulkan_context.device.transfer_queue = 0;
     vkDestroyDevice(vulkan_context.device.logical_device,
                     vulkan_context.allocator);
+
+    ofree(vulkan_context.device.swapchain_support.present_modes);
+    ofree(vulkan_context.device.swapchain_support.formats);
 }

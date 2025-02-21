@@ -44,7 +44,6 @@ void create(unsigned width, unsigned height, VulkanSwapchain *swapchain) {
         }
     }
 
-    vulkan_device_query_swapchain_support();
     if (support_info->capabilities.currentExtent.width != UINT32_MAX) {
         swapchain_extent = support_info->capabilities.currentExtent;
     }
@@ -146,11 +145,10 @@ void create(unsigned width, unsigned height, VulkanSwapchain *swapchain) {
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true, VK_IMAGE_ASPECT_DEPTH_BIT,
         &swapchain->depth_attachment);
 
-    ilog("swapchain created");
+    ilog("swapchain created successfully");
 }
 
 void destroy(VulkanSwapchain *swapchain) {
-    ilog("cleaning up swapchain");
     vulkan_image_destroy(&swapchain->depth_attachment);
 
     for (unsigned int i = 0; i < swapchain->image_count; ++i) {
@@ -158,8 +156,14 @@ void destroy(VulkanSwapchain *swapchain) {
                            swapchain->views[i], vulkan_context.allocator);
     }
 
+    ofree(swapchain->images);
+    ofree(swapchain->views);
+
     vkDestroySwapchainKHR(vulkan_context.device.logical_device,
                           swapchain->handle, vulkan_context.allocator);
+
+    swapchain->images = 0;
+    swapchain->views = 0;
 }
 
 void vulkan_swapchain_create(unsigned int width, unsigned int height,

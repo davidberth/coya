@@ -3,6 +3,7 @@
 #include "renderer/vulkan/types.h"
 #include "renderer/vulkan/util.h"
 #include "renderer/vulkan/device.h"
+#include "renderer/vulkan/swapchain.h"
 
 extern VulkanContext vulkan_context;
 
@@ -120,11 +121,15 @@ bool renderer_init() {
         elog("failed to create vulkan surface");
         return false;
     }
+
     if (!vulkan_device_create()) {
         elog("failed to create vulkan device");
         return false;
     }
-    ilog("vulkan surface created");
+
+    vulkan_swapchain_create(vulkan_context.framebuffer_width,
+                            vulkan_context.framebuffer_height,
+                            &vulkan_context.swapchain);
 
     dlog("vulkan renderer initialized");
     return true;

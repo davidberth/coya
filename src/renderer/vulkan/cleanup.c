@@ -2,6 +2,7 @@
 #include "core/logger.h"
 #include "core/memory.h"
 #include "renderer/vulkan/device.h"
+#include "renderer/vulkan/swapchain.h"
 #include <vulkan/vulkan_core.h>
 
 extern VulkanContext vulkan_context;
@@ -20,6 +21,9 @@ void renderer_cleanup() {
     }
 #endif
 
+    dlog("cleaning up the swapchain");
+    vulkan_swapchain_destroy(&vulkan_context.swapchain);
+
     dlog("cleaning up device");
     vulkan_device_cleanup();
 
@@ -28,10 +32,6 @@ void renderer_cleanup() {
         vkDestroySurfaceKHR(vulkan_context.instance, vulkan_context.surface,
                             vulkan_context.allocator);
     }
-
-    dlog("cleaning up the swapchain info");
-    ofree(vulkan_context.device.swapchain_support.formats);
-    ofree(vulkan_context.device.swapchain_support.present_modes);
 
     vkDestroyInstance(vulkan_context.instance, vulkan_context.allocator);
     dlog("vulkan instance destroyed");

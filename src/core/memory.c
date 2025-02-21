@@ -17,6 +17,8 @@ static const char *memory_category_names[] = {
 // allocate memory and store header before user pointer
 void *oalloc(size_t size, MemoryCategory category) {
     // allocate memory for header and user data
+    dlog("Allocating %zu bytes in category %s", size,
+         memory_category_names[category]);
     size_t total_size = sizeof(Opointer) + size;
 
     void *block = malloc(total_size);
