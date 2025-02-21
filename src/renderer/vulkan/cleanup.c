@@ -21,18 +21,18 @@ void renderer_cleanup() {
     }
 #endif
 
-    dlog("cleaning up the swapchain");
+    ilog("cleaning up the swapchain");
     vulkan_swapchain_destroy(&vulkan_context.swapchain);
 
-    dlog("cleaning up device");
+    ilog("cleaning up device");
     vulkan_device_cleanup();
 
-    dlog("cleaning up the surface");
+    ilog("cleaning up the surface");
     if (vulkan_context.surface) {
         vkDestroySurfaceKHR(vulkan_context.instance, vulkan_context.surface,
                             vulkan_context.allocator);
     }
 
     vkDestroyInstance(vulkan_context.instance, vulkan_context.allocator);
-    dlog("vulkan instance destroyed");
+    ilog("vulkan instance destroyed");
 }

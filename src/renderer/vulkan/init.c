@@ -131,6 +131,6 @@ bool renderer_init() {
                             vulkan_context.framebuffer_height,
                             &vulkan_context.swapchain);
 
-    dlog("vulkan renderer initialized");
+    ilog("vulkan renderer initialized");
     return true;
 }

@@ -5,6 +5,7 @@
 #include "input/input.h"
 #include "platform/platform.h"
 #include "renderer/renderer.h"
+#include <stdio.h>
 
 char *get_window_title() {
 #define TITLE_SIZE                                                             \
@@ -39,11 +40,11 @@ void on_input_up(EventContext context) {
 
 int main() {
     init_logger();
-    dlog("starting application");
+    ilog("starting application");
     ilog("application name: %s", APPNAME);
-    wlog("application version: %s", APPVERSION);
-    elog("renderer: %s", RENDERER);
-    wlog("platform: %s", PLATFORM);
+    ilog("application version: %s", APPVERSION);
+    ilog("renderer: %s", RENDERER);
+    ilog("platform: %s", PLATFORM);
     ilog("date: %s", BUILDDATE);
     char *root_directory = platform_set_to_root_directory();
     ilog("current directory: %s", root_directory);
@@ -72,6 +73,6 @@ int main() {
     renderer_cleanup();
     platform_cleanup();
     memory_cleanup();
-    dlog("application shutdown");
+    ilog("application shutdown");
     return 0;
 }

@@ -17,7 +17,7 @@ static const char *memory_category_names[] = {
 // allocate memory and store header before user pointer
 void *oalloc(size_t size, MemoryCategory category) {
     // allocate memory for header and user data
-    dlog("Allocating %zu bytes in category %s", size,
+    mlog("allocating %zu bytes in category %s", size,
          memory_category_names[category]);
     size_t total_size = sizeof(Opointer) + size;
 
@@ -47,6 +47,8 @@ void ofree(void *pointer) {
     // update allocation tracking
     memory_totals[opointer_ptr->category] -= opointer_ptr->allocation_size;
     // free the entire block
+    mlog("freeing %zu bytes in category %s", opointer_ptr->allocation_size,
+         memory_category_names[opointer_ptr->category]);
     free((void *)opointer_ptr);
 }
 
@@ -66,11 +68,11 @@ size_t get_total_allocated_memory() {
 
 // log memory report
 void log_memory_report() {
-    dlog("memory report:");
+    mlog("memory report:");
     for (int i = 0; i < MEMORY_CATEGORY_COUNT; ++i) {
-        dlog(" %-12s: %zu bytes", memory_category_names[i], memory_totals[i]);
+        mlog(" %-12s: %zu bytes", memory_category_names[i], memory_totals[i]);
     }
-    dlog(" Total       : %zu bytes", get_total_allocated_memory());
+    mlog(" Total       : %zu bytes", get_total_allocated_memory());
 }
 
 void memory_cleanup() {

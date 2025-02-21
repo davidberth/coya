@@ -1,6 +1,7 @@
 #include "logger.h"
 #include <string.h>
 #include <sys\timeb.h>
+#include <stdio.h>
 
 static struct timeb start;
 
@@ -16,8 +17,8 @@ void log_message(log_level level, const char *message, const char *file,
                             (current.millitm - start.millitm) / 1000.0f;
 
     static const char *level_strings[] = {
-        "\033[0;32m[INFO]    ", "[DEBUG]   ", "\033[0;33m[WARNING] ",
-        "\033[0;31m[ERROR]   ", "\033[0;31m[FATAL]   "};
+        "\033[0;32m[INFO]    ", "\033[0;34m[MEMORY]  ", "[DEBUG]   ",
+        "\033[0;33m[WARNING] ", "\033[0;31m[ERROR]   ", "\033[0;31m[FATAL]   "};
     printf("%s", level_strings[level]);
 
     size_t file_length = strlen(file);
