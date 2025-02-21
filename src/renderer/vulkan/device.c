@@ -3,7 +3,7 @@
 #include "core/memory.h"
 #include "device.h"
 #include "renderer/vulkan/util.h"
-#include "renderer/vulkan/context.h"
+#include "renderer/vulkan/types.h"
 
 extern VulkanContext vulkan_context;
 
@@ -295,5 +295,6 @@ void vulkan_device_cleanup() {
     vulkan_context.device.graphics_queue = 0;
     vulkan_context.device.present_queue = 0;
     vulkan_context.device.transfer_queue = 0;
-    vkDestroyDevice(vulkan_context.device.logical_device, nullptr);
+    vkDestroyDevice(vulkan_context.device.logical_device,
+                    vulkan_context.allocator);
 }

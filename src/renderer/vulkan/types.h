@@ -2,6 +2,15 @@
 
 #include <vulkan/vulkan.h>
 
+// image
+typedef struct {
+    VkImage handle;
+    VkDeviceMemory memory;
+    VkImageView view;
+    unsigned int width;
+    unsigned int height;
+} VulkanImage;
+
 // swapchain support info
 typedef struct {
     VkSurfaceCapabilitiesKHR capabilities;
@@ -21,7 +30,7 @@ typedef struct {
 
     VulkanSwapchainSupportInfo swapchain_support;
 
-    VkFormat depth_format; 
+    VkFormat depth_format;
 
     int graphics_queue_index;
     int present_queue_index;
@@ -41,6 +50,8 @@ typedef struct {
     unsigned int image_count;
     VkImage *images;
     VkImageView *views;
+
+    VulkanImage depth_attachment;
 } VulkanSwapchain;
 
 // vulkan context
@@ -52,10 +63,16 @@ typedef struct {
     VulkanDevice device;
     VkSurfaceKHR surface;
     VulkanSwapchain swapchain;
+
+    VkAllocationCallbacks *allocator;
+
     unsigned int image_index;
     unsigned int current_frame;
 
     bool recreating_swapchain;
+
+    int (*find_memory_index)(unsigned int type_filter,
+                             unsigned int property_flags);
 
 #if defined(_DEBUG)
     VkDebugUtilsMessengerEXT debug_messenger;

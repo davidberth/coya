@@ -1,4 +1,4 @@
-#include "renderer/vulkan/context.h"
+#include "renderer/vulkan/types.h"
 #include "core/logger.h"
 #include "core/memory.h"
 #include "renderer/vulkan/device.h"
@@ -15,7 +15,8 @@ void renderer_cleanup() {
             (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
                 vulkan_context.instance, "vkDestroyDebugUtilsMessengerEXT");
 
-        func(vulkan_context.instance, vulkan_context.debug_messenger, nullptr);
+        func(vulkan_context.instance, vulkan_context.debug_messenger,
+             vulkan_context.allocator);
     }
 #endif
 
@@ -25,13 +26,13 @@ void renderer_cleanup() {
     dlog("cleaning up the surface");
     if (vulkan_context.surface) {
         vkDestroySurfaceKHR(vulkan_context.instance, vulkan_context.surface,
-                            nullptr);
+                            vulkan_context.allocator);
     }
 
     dlog("cleaning up the swapchain info");
     ofree(vulkan_context.device.swapchain_support.formats);
     ofree(vulkan_context.device.swapchain_support.present_modes);
 
-    vkDestroyInstance(vulkan_context.instance, nullptr);
+    vkDestroyInstance(vulkan_context.instance, vulkan_context.allocator);
     dlog("vulkan instance destroyed");
 }

@@ -1,14 +1,6 @@
 #pragma once
 
-#include "renderer/vulkan/context.h"
-
-typedef struct {
-    VkImage handle;
-    VkDeviceMemory memory;
-    VkImageView view;
-    unsigned int width;
-    unsigned int height;
-} VulkanImage;
+#include "renderer/vulkan/types.h"
 
 void vulkan_image_create(VkImageType image_type, unsigned int width,
                          unsigned int height, VkFormat format,

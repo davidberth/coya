@@ -1,9 +1,10 @@
 #include "swapchain.h"
 
 #include "core/logger.h"
-#include "renderer/vulkan/context.h"
+#include "renderer/vulkan/types.h"
 #include "renderer/vulkan/device.h"
 #include "renderer/vulkan/util.h"
+#include "renderer/vulkan/image.h"
 #include "core/util.h"
 #include "core/memory.h"
 #include <vulkan/vulkan_core.h>
@@ -129,18 +130,37 @@ void create(unsigned width, unsigned height, VulkanSwapchain *swapchain) {
         view_info.subresourceRange.layerCount = 1;
 
         vk_check(vkCreateImageView(vulkan_context.device.logical_device,
-                                   &view_info, nullptr, &swapchain->views[i]));
+                                   &view_info, vulkan_context.allocator,
+                                   &swapchain->views[i]));
     }
 
     if (!vulkan_device_detect_depth_format()) {
         vulkan_context.device.depth_format = VK_FORMAT_UNDEFINED;
-        flog("failed to fined supported depth format");
+        flog("failed to find supported depth format");
     }
+
+    vulkan_image_create(
+        VK_IMAGE_TYPE_2D, swapchain_extent.width, swapchain_extent.height,
+        vulkan_context.device.depth_format, VK_IMAGE_TILING_OPTIMAL,
+        VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true, VK_IMAGE_ASPECT_DEPTH_BIT,
+        &swapchain->depth_attachment);
 
     ilog("swapchain created");
 }
 
-void destroy(VulkanSwapchain *swapchain) {}
+void destroy(VulkanSwapchain *swapchain) {
+    ilog("cleaning up swapchain");
+    vulkan_image_destroy(&swapchain->depth_attachment);
+
+    for (unsigned int i = 0; i < swapchain->image_count; ++i) {
+        vkDestroyImageView(vulkan_context.device.logical_device,
+                           swapchain->views[i], vulkan_context.allocator);
+    }
+
+    vkDestroySwapchainKHR(vulkan_context.device.logical_device,
+                          swapchain->handle, vulkan_context.allocator);
+}
 
 void vulkan_swapchain_create(unsigned int width, unsigned int height,
                              VulkanSwapchain *out_swapchain) {

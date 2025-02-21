@@ -1,6 +1,6 @@
 #include "core/logger.h"
 #include "platform/util.h"
-#include "renderer/vulkan/context.h"
+#include "renderer/vulkan/types.h"
 #include "renderer/vulkan/util.h"
 #include "renderer/vulkan/device.h"
 
@@ -26,7 +26,27 @@ vk_debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
     return VK_FALSE;
 }
 
+int find_memory_index(unsigned int type_filter, unsigned int property_flags) {
+    VkPhysicalDeviceMemoryProperties memory_properties;
+    vkGetPhysicalDeviceMemoryProperties(vulkan_context.device.physical_device,
+                                        &memory_properties);
+
+    for (unsigned int i = 0; i < memory_properties.memoryTypeCount; i++) {
+        if ((type_filter & (1 << i)) &&
+            (memory_properties.memoryTypes[i].propertyFlags & property_flags) ==
+                property_flags) {
+            return i;
+        }
+    }
+    wlog("unable to find suitable memory type");
+
+    return -1;
+}
+
 bool renderer_init() {
+
+    vulkan_context.find_memory_index = find_memory_index;
+    vulkan_context.allocator = nullptr;
 
     VkApplicationInfo app_info = {VK_STRUCTURE_TYPE_APPLICATION_INFO};
     app_info.pApplicationName = "Coya";
@@ -68,7 +88,8 @@ bool renderer_init() {
     create_info.ppEnabledLayerNames = nullptr;
 #endif
 
-    vk_check(vkCreateInstance(&create_info, nullptr, &vulkan_context.instance));
+    vk_check(vkCreateInstance(&create_info, vulkan_context.allocator,
+                              &vulkan_context.instance));
     ilog("vulkan instance created");
 
 #if defined(_DEBUG)
@@ -88,8 +109,8 @@ bool renderer_init() {
     PFN_vkCreateDebugUtilsMessengerEXT func =
         (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
             vulkan_context.instance, "vkCreateDebugUtilsMessengerEXT");
-    vk_check(func(vulkan_context.instance, &debug_create_info, nullptr,
-                  &vulkan_context.debug_messenger));
+    vk_check(func(vulkan_context.instance, &debug_create_info,
+                  vulkan_context.allocator, &vulkan_context.debug_messenger));
     dlog("vulkan debug messenger created");
 
 #endif

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "renderer/vulkan/context.h"
+#include "renderer/vulkan/types.h"
 
 void vulkan_swapchain_create(unsigned int width, unsigned int height,
                              VulkanSwapchain *out_swapchain);
