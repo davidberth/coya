@@ -57,6 +57,8 @@ typedef struct {
     int transfer_queue_index;
     int compute_queue_index;
 
+    VkCommandPool graphics_command_pool;
+
     VkQueue graphics_queue;
     VkQueue present_queue;
     VkQueue transfer_queue;
@@ -105,6 +107,8 @@ typedef struct {
 
     bool recreating_swapchain;
     VulkanRenderpass main_renderpass;
+
+    VulkanCommandBuffer *graphics_command_buffers;
 
     int (*find_memory_index)(
       unsigned int type_filter, unsigned int property_flags);

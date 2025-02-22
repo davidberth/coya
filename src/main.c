@@ -10,11 +10,11 @@
 char *get_window_title() {
 #define TITLE_SIZE                                                             \
     (sizeof(APPNAME) + sizeof(APPVERSION) + sizeof(RENDERER) +                 \
-     sizeof(PLATFORM) + sizeof(BUILDDATE) + 9)
+      sizeof(PLATFORM) + sizeof(BUILDDATE) + 11)
 
     static char title[TITLE_SIZE];
     snprintf(title, TITLE_SIZE, "%s %s [%s] %s %s: %s", APPNAME, APPVERSION,
-             BUILDDATE, RENDERER, PLATFORM, BUILDTYPE);
+      BUILDDATE, RENDERER, PLATFORM, BUILDTYPE);
     return title;
 }
 

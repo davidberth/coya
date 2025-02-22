@@ -1,10 +1,12 @@
 #include "core/logger.h"
+#include "core/memory.h"
 #include "platform/util.h"
-#include "renderer/vulkan/types.h"
-#include "renderer/vulkan/util.h"
-#include "renderer/vulkan/device.h"
-#include "renderer/vulkan/swapchain.h"
-#include "renderer/vulkan/renderpass.h"
+#include "types.h"
+#include "util.h"
+#include "device.h"
+#include "swapchain.h"
+#include "renderpass.h"
+#include "command_buffer.h"
 
 extern VulkanContext vulkan_context;
 
@@ -44,10 +46,37 @@ int find_memory_index(unsigned int type_filter, unsigned int property_flags) {
     return -1;
 }
 
-bool renderer_init() {
+void create_command_buffers() {
+    if (!vulkan_context.graphics_command_buffers) {
+        vulkan_context.graphics_command_buffers = (VulkanCommandBuffer *)oalloc(
+          sizeof(VulkanCommandBuffer) * vulkan_context.swapchain.image_count,
+          MEMORY_CATEGORY_VULKAN);
 
+        for (unsigned int i = 0; i < vulkan_context.swapchain.image_count;
+          i++) {
+            vulkan_context.graphics_command_buffers[i].handle = 0;
+            vulkan_context.graphics_command_buffers[i].state =
+              COMMAND_BUFFER_STATE_NOT_ALLOCATED;
+        }
+    }
+
+    for (unsigned int i = 0; i < vulkan_context.swapchain.image_count; i++) {
+        if (vulkan_context.graphics_command_buffers[i].handle) {
+            vulkan_command_buffer_free(
+              vulkan_context.device.graphics_command_pool,
+              &vulkan_context.graphics_command_buffers[i]);
+        }
+
+        vulkan_command_buffer_allocate(
+          vulkan_context.device.graphics_command_pool, true,
+          &vulkan_context.graphics_command_buffers[i]);
+    }
+}
+
+bool renderer_init() {
     vulkan_context.find_memory_index = find_memory_index;
     vulkan_context.allocator = nullptr;
+    vulkan_context.graphics_command_buffers = nullptr;
 
     VkApplicationInfo app_info = {VK_STRUCTURE_TYPE_APPLICATION_INFO};
     app_info.pApplicationName = "Coya";
@@ -134,6 +163,8 @@ bool renderer_init() {
     vulkan_renderpass_create(&vulkan_context.main_renderpass, 0.0f, 0.0f,
       vulkan_context.framebuffer_width, vulkan_context.framebuffer_height, 0.0f,
       0.0f, 0.2f, 1.0f, 1.0f, 0);
+
+    create_command_buffers();
 
     ilog("vulkan renderer initialized");
     return true;

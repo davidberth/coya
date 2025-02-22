@@ -1,8 +1,10 @@
 #include "core/logger.h"
-#include "renderer/vulkan/types.h"
-#include "renderer/vulkan/device.h"
-#include "renderer/vulkan/swapchain.h"
-#include "renderer/vulkan/renderpass.h"
+#include "core/memory.h"
+#include "types.h"
+#include "device.h"
+#include "swapchain.h"
+#include "renderpass.h"
+#include "command_buffer.h"
 #include <vulkan/vulkan_core.h>
 
 extern VulkanContext vulkan_context;
@@ -21,7 +23,21 @@ void renderer_cleanup() {
     }
 #endif
 
-    ilog("clearning up the main renderpass");
+    ilog("cleaning up graphics command buffers");
+    for (unsigned int i = 0; i < vulkan_context.swapchain.image_count; i++) {
+        if (vulkan_context.graphics_command_buffers[i].handle) {
+            vulkan_command_buffer_free(
+              vulkan_context.device.graphics_command_pool,
+              &vulkan_context.graphics_command_buffers[i]);
+        }
+    }
+    ofree(vulkan_context.graphics_command_buffers);
+
+    ilog("cleaning up the command pool");
+    vkDestroyCommandPool(vulkan_context.device.logical_device,
+      vulkan_context.device.graphics_command_pool, vulkan_context.allocator);
+
+    ilog("cleaning up the main renderpass");
     vulkan_renderpass_destroy(&vulkan_context.main_renderpass);
 
     ilog("cleaning up the swapchain");

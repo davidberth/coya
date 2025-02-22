@@ -10,55 +10,54 @@ extern VulkanContext vulkan_context;
 void vulkan_device_query_swapchain_support() {
     ilog("getting swapchain support info");
     vk_check(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
-        vulkan_context.device.physical_device, vulkan_context.surface,
-        &vulkan_context.device.swapchain_support.capabilities));
+      vulkan_context.device.physical_device, vulkan_context.surface,
+      &vulkan_context.device.swapchain_support.capabilities));
 
     vk_check(vkGetPhysicalDeviceSurfaceFormatsKHR(
-        vulkan_context.device.physical_device, vulkan_context.surface,
-        &vulkan_context.device.swapchain_support.format_count, nullptr));
+      vulkan_context.device.physical_device, vulkan_context.surface,
+      &vulkan_context.device.swapchain_support.format_count, nullptr));
 
     if (vulkan_context.device.swapchain_support.format_count != 0) {
         vulkan_context.device.swapchain_support.formats =
-            (VkSurfaceFormatKHR *)oalloc(
-                sizeof(VkSurfaceFormatKHR) *
-                    vulkan_context.device.swapchain_support.format_count,
-                MEMORY_CATEGORY_VULKAN);
+          (VkSurfaceFormatKHR *)oalloc(
+            sizeof(VkSurfaceFormatKHR) *
+              vulkan_context.device.swapchain_support.format_count,
+            MEMORY_CATEGORY_VULKAN);
 
         vk_check(vkGetPhysicalDeviceSurfaceFormatsKHR(
-            vulkan_context.device.physical_device, vulkan_context.surface,
-            &vulkan_context.device.swapchain_support.format_count,
-            vulkan_context.device.swapchain_support.formats));
+          vulkan_context.device.physical_device, vulkan_context.surface,
+          &vulkan_context.device.swapchain_support.format_count,
+          vulkan_context.device.swapchain_support.formats));
     }
 
     vk_check(vkGetPhysicalDeviceSurfacePresentModesKHR(
-        vulkan_context.device.physical_device, vulkan_context.surface,
-        &vulkan_context.device.swapchain_support.present_mode_count, nullptr));
+      vulkan_context.device.physical_device, vulkan_context.surface,
+      &vulkan_context.device.swapchain_support.present_mode_count, nullptr));
 
     if (vulkan_context.device.swapchain_support.present_mode_count != 0) {
         vulkan_context.device.swapchain_support.present_modes =
-            (VkPresentModeKHR *)oalloc(
-                sizeof(VkPresentModeKHR) *
-                    vulkan_context.device.swapchain_support.present_mode_count,
-                MEMORY_CATEGORY_VULKAN);
+          (VkPresentModeKHR *)oalloc(
+            sizeof(VkPresentModeKHR) *
+              vulkan_context.device.swapchain_support.present_mode_count,
+            MEMORY_CATEGORY_VULKAN);
 
         vk_check(vkGetPhysicalDeviceSurfacePresentModesKHR(
-            vulkan_context.device.physical_device, vulkan_context.surface,
-            &vulkan_context.device.swapchain_support.present_mode_count,
-            vulkan_context.device.swapchain_support.present_modes));
+          vulkan_context.device.physical_device, vulkan_context.surface,
+          &vulkan_context.device.swapchain_support.present_mode_count,
+          vulkan_context.device.swapchain_support.present_modes));
     }
 }
 
 bool vulkan_device_detect_depth_format() {
     constexpr unsigned int candidate_count = 3;
     VkFormat candidates[candidate_count] = {VK_FORMAT_D32_SFLOAT,
-                                            VK_FORMAT_D32_SFLOAT_S8_UINT,
-                                            VK_FORMAT_D24_UNORM_S8_UINT};
+      VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT};
 
     unsigned int flags = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
     for (unsigned int i = 0; i < candidate_count; i++) {
         VkFormatProperties props;
         vkGetPhysicalDeviceFormatProperties(
-            vulkan_context.device.physical_device, candidates[i], &props);
+          vulkan_context.device.physical_device, candidates[i], &props);
         if ((props.optimalTilingFeatures & flags) == flags) {
             vulkan_context.device.depth_format = candidates[i];
             return true;
@@ -73,8 +72,8 @@ bool vulkan_device_detect_depth_format() {
 bool select_physical_device() {
 
     unsigned int physical_device_count = 0;
-    vk_check(vkEnumeratePhysicalDevices(vulkan_context.instance,
-                                        &physical_device_count, nullptr));
+    vk_check(vkEnumeratePhysicalDevices(
+      vulkan_context.instance, &physical_device_count, nullptr));
     if (physical_device_count == 0) {
         elog("failed to find GPUs with Vulkan support");
         return false;
@@ -82,12 +81,11 @@ bool select_physical_device() {
 
     ilog("found %d physical devices", physical_device_count);
 
-    VkPhysicalDevice *physical_devices =
-        oalloc(sizeof(VkPhysicalDevice) * physical_device_count,
-               MEMORY_CATEGORY_VULKAN);
+    VkPhysicalDevice *physical_devices = oalloc(
+      sizeof(VkPhysicalDevice) * physical_device_count, MEMORY_CATEGORY_VULKAN);
 
     vk_check(vkEnumeratePhysicalDevices(
-        vulkan_context.instance, &physical_device_count, physical_devices));
+      vulkan_context.instance, &physical_device_count, physical_devices));
 
     VkPhysicalDeviceProperties properties;
     VkPhysicalDeviceFeatures features;
@@ -112,25 +110,25 @@ bool select_physical_device() {
     ilog("selected device:");
     ilog(" %s", properties.deviceName);
     ilog("Vulkan version: %d.%d.%d", VK_VERSION_MAJOR(properties.apiVersion),
-         VK_VERSION_MINOR(properties.apiVersion),
-         VK_VERSION_PATCH(properties.apiVersion));
+      VK_VERSION_MINOR(properties.apiVersion),
+      VK_VERSION_PATCH(properties.apiVersion));
 
     ilog("GPU driver version: %d.%d.%d",
-         VK_VERSION_MAJOR(properties.driverVersion),
-         VK_VERSION_MINOR(properties.driverVersion),
-         VK_VERSION_PATCH(properties.driverVersion));
+      VK_VERSION_MAJOR(properties.driverVersion),
+      VK_VERSION_MINOR(properties.driverVersion),
+      VK_VERSION_PATCH(properties.driverVersion));
 
     vulkan_context.device.properties = properties;
     vulkan_context.device.features = features;
 
     VkPhysicalDeviceMemoryProperties memory;
-    vkGetPhysicalDeviceMemoryProperties(vulkan_context.device.physical_device,
-                                        &memory);
+    vkGetPhysicalDeviceMemoryProperties(
+      vulkan_context.device.physical_device, &memory);
 
     for (unsigned int i = 0; i < memory.memoryTypeCount; i++) {
         float memory_size_gb =
-            (((float)memory.memoryHeaps[memory.memoryTypes[i].heapIndex].size) /
-             1073741824.0f);
+          (((float)memory.memoryHeaps[memory.memoryTypes[i].heapIndex].size) /
+            1073741824.0f);
         if (memory.memoryHeaps[i].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) {
             ilog("found device local memory: %.2f GB", memory_size_gb);
         }
@@ -140,15 +138,15 @@ bool select_physical_device() {
 
     unsigned int queue_family_count = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(
-        vulkan_context.device.physical_device, &queue_family_count, nullptr);
+      vulkan_context.device.physical_device, &queue_family_count, nullptr);
 
     VkQueueFamilyProperties *queue_families = (VkQueueFamilyProperties *)oalloc(
-        sizeof(VkQueueFamilyProperties) * queue_family_count,
-        MEMORY_CATEGORY_VULKAN);
+      sizeof(VkQueueFamilyProperties) * queue_family_count,
+      MEMORY_CATEGORY_VULKAN);
 
     vkGetPhysicalDeviceQueueFamilyProperties(
-        vulkan_context.device.physical_device, &queue_family_count,
-        queue_families);
+      vulkan_context.device.physical_device, &queue_family_count,
+      queue_families);
 
     vulkan_context.device.graphics_queue_index = -1;
     vulkan_context.device.present_queue_index = -1;
@@ -184,8 +182,8 @@ bool select_physical_device() {
         }
         VkBool32 present_support = false;
         vkGetPhysicalDeviceSurfaceSupportKHR(
-            vulkan_context.device.physical_device, i, vulkan_context.surface,
-            &present_support);
+          vulkan_context.device.physical_device, i, vulkan_context.surface,
+          &present_support);
         if (present_support) {
             if (queues_taken < present_taken) {
                 vulkan_context.device.present_queue_index = i;
@@ -212,11 +210,11 @@ bool select_physical_device() {
 bool create_logical_device() {
     ilog("creating logical device");
     bool present_shares_graphics_queue =
-        vulkan_context.device.graphics_queue_index ==
-        vulkan_context.device.present_queue_index;
+      vulkan_context.device.graphics_queue_index ==
+      vulkan_context.device.present_queue_index;
     bool transfer_shares_graphics_queue =
-        vulkan_context.device.graphics_queue_index ==
-        vulkan_context.device.transfer_queue_index;
+      vulkan_context.device.graphics_queue_index ==
+      vulkan_context.device.transfer_queue_index;
 
     unsigned int index_count = 1;
     unsigned int index = 0;
@@ -235,7 +233,7 @@ bool create_logical_device() {
     VkDeviceQueueCreateInfo queue_create_infos[index_count];
     for (unsigned int i = 0; i < index_count; i++) {
         queue_create_infos[i].sType =
-            VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+          VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queue_create_infos[i].queueFamilyIndex = indices[i];
         queue_create_infos[i].queueCount = 1;
         if (indices[i] == vulkan_context.device.graphics_queue_index) {
@@ -251,7 +249,7 @@ bool create_logical_device() {
     device_features.samplerAnisotropy = VK_TRUE;
 
     VkDeviceCreateInfo device_create_info = {
-        VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO};
+      VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO};
     device_create_info.queueCreateInfoCount = index_count;
     device_create_info.pQueueCreateInfos = queue_create_infos;
     device_create_info.pEnabledFeatures = &device_features;
@@ -260,24 +258,34 @@ bool create_logical_device() {
     device_create_info.ppEnabledExtensionNames = &extension_names;
 
     vk_check(vkCreateDevice(vulkan_context.device.physical_device,
-                            &device_create_info, nullptr,
-                            &vulkan_context.device.logical_device));
+      &device_create_info, nullptr, &vulkan_context.device.logical_device));
 
     ilog("logical device created");
 
     ilog("getting device queues");
     vkGetDeviceQueue(vulkan_context.device.logical_device,
-                     vulkan_context.device.graphics_queue_index, 0,
-                     &vulkan_context.device.graphics_queue);
+      vulkan_context.device.graphics_queue_index, 0,
+      &vulkan_context.device.graphics_queue);
 
     vkGetDeviceQueue(vulkan_context.device.logical_device,
-                     vulkan_context.device.present_queue_index, 0,
-                     &vulkan_context.device.present_queue);
+      vulkan_context.device.present_queue_index, 0,
+      &vulkan_context.device.present_queue);
 
     vkGetDeviceQueue(vulkan_context.device.logical_device,
-                     vulkan_context.device.transfer_queue_index, 0,
-                     &vulkan_context.device.transfer_queue);
+      vulkan_context.device.transfer_queue_index, 0,
+      &vulkan_context.device.transfer_queue);
     ilog("device queues retrieved");
+
+    VkCommandPoolCreateInfo pool_create_info = {
+      VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO};
+    pool_create_info.queueFamilyIndex =
+      vulkan_context.device.graphics_queue_index;
+    pool_create_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+
+    vk_check(vkCreateCommandPool(vulkan_context.device.logical_device,
+      &pool_create_info, vulkan_context.allocator,
+      &vulkan_context.device.graphics_command_pool));
+    ilog("graphics command pool created");
 
     return true;
 }
@@ -295,8 +303,8 @@ void vulkan_device_cleanup() {
     vulkan_context.device.graphics_queue = 0;
     vulkan_context.device.present_queue = 0;
     vulkan_context.device.transfer_queue = 0;
-    vkDestroyDevice(vulkan_context.device.logical_device,
-                    vulkan_context.allocator);
+    vkDestroyDevice(
+      vulkan_context.device.logical_device, vulkan_context.allocator);
 
     ofree(vulkan_context.device.swapchain_support.present_modes);
     ofree(vulkan_context.device.swapchain_support.formats);

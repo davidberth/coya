@@ -9,8 +9,8 @@
 HWND window_handle = nullptr;
 HINSTANCE window_hinstance = nullptr;
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
-                            LPARAM lParam) {
+LRESULT CALLBACK WindowProc(
+  HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_CLOSE:
         DestroyWindow(hwnd);
@@ -39,7 +39,7 @@ bool platform_init(int width, int height, char *title) {
     wc.lpszClassName = APPNAME;
 
     HICON icon = (HICON)LoadImage(wc.hInstance, "resources/icons/main.ico",
-                                  IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
+      IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
 
     if (!icon) {
         elog("failed to load icon");
@@ -57,19 +57,18 @@ bool platform_init(int width, int height, char *title) {
     int screen_height = GetSystemMetrics(SM_CYSCREEN); // get monitor height
     RECT temp_rect = {0, 0, width, height};            // define window rect
     AdjustWindowRect(&temp_rect, WS_OVERLAPPEDWINDOW,
-                     FALSE); // adjust window size for style
+      FALSE); // adjust window size for style
     int window_width =
-        temp_rect.right - temp_rect.left; // compute adjusted width
+      temp_rect.right - temp_rect.left; // compute adjusted width
     int window_height =
-        temp_rect.bottom - temp_rect.top; // compute adjusted height
-    // TODO: center window back to /2
-    int pos_x = (screen_width - window_width) / 22; // compute center x position
+      temp_rect.bottom - temp_rect.top;            // compute adjusted height
+    int pos_x = (screen_width - window_width) / 2; // compute center x position
     int pos_y =
-        (screen_height - window_height) / 2; // compute center y position
+      (screen_height - window_height) / 2; // compute center y position
 
-    window_handle = CreateWindowEx(0, APPNAME, title, WS_OVERLAPPEDWINDOW,
-                                   pos_x, pos_y, window_width, window_height,
-                                   nullptr, nullptr, wc.hInstance, nullptr);
+    window_handle =
+      CreateWindowEx(0, APPNAME, title, WS_OVERLAPPEDWINDOW, pos_x, pos_y,
+        window_width, window_height, nullptr, nullptr, wc.hInstance, nullptr);
     if (!window_handle) {
         elog("failed to create window");
         return false;
