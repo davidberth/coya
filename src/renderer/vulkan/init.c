@@ -1,5 +1,6 @@
 #include "core/logger.h"
 #include "core/memory.h"
+#include "platform/platform.h"
 #include "platform/util.h"
 #include "types.h"
 #include "util.h"
@@ -7,6 +8,7 @@
 #include "swapchain.h"
 #include "renderpass.h"
 #include "command_buffer.h"
+#include "framebuffer.h"
 
 extern VulkanContext vulkan_context;
 
@@ -73,10 +75,29 @@ void create_command_buffers() {
     }
 }
 
+void regenerate_framebuffers(
+  VulkanSwapchain *swapchain, VulkanRenderpass *renderpass) {
+    ilog("regenerating framebuffers");
+    for (unsigned int i = 0; i < swapchain->image_count; i++) {
+        unsigned int attachment_count = 2;
+        VkImageView attachments[2] = {
+          swapchain->views[i], vulkan_context.swapchain.depth_attachment.view};
+
+        vulkan_framebuffer_create(renderpass, vulkan_context.framebuffer_width,
+          vulkan_context.framebuffer_height, attachment_count, attachments,
+          &vulkan_context.swapchain.framebuffers[i]);
+    }
+}
+
 bool renderer_init() {
     vulkan_context.find_memory_index = find_memory_index;
     vulkan_context.allocator = nullptr;
     vulkan_context.graphics_command_buffers = nullptr;
+    vulkan_context.swapchain.framebuffers = nullptr;
+
+    // grab the window width and height
+    platform_get_window_size(
+      &vulkan_context.framebuffer_width, &vulkan_context.framebuffer_height);
 
     VkApplicationInfo app_info = {VK_STRUCTURE_TYPE_APPLICATION_INFO};
     app_info.pApplicationName = "Coya";
@@ -163,6 +184,14 @@ bool renderer_init() {
     vulkan_renderpass_create(&vulkan_context.main_renderpass, 0.0f, 0.0f,
       vulkan_context.framebuffer_width, vulkan_context.framebuffer_height, 0.0f,
       0.0f, 0.2f, 1.0f, 1.0f, 0);
+
+    // swapchan framebuffers
+    vulkan_context.swapchain.framebuffers = (VulkanFramebuffer *)oalloc(
+      sizeof(VulkanFramebuffer) * vulkan_context.swapchain.image_count,
+      MEMORY_CATEGORY_VULKAN);
+
+    regenerate_framebuffers(
+      &vulkan_context.swapchain, &vulkan_context.main_renderpass);
 
     create_command_buffers();
 

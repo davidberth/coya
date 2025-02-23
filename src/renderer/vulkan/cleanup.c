@@ -5,6 +5,7 @@
 #include "swapchain.h"
 #include "renderpass.h"
 #include "command_buffer.h"
+#include "framebuffer.h"
 #include <vulkan/vulkan_core.h>
 
 extern VulkanContext vulkan_context;
@@ -22,6 +23,16 @@ void renderer_cleanup() {
           vulkan_context.allocator);
     }
 #endif
+
+    ilog("cleaning up swapchain framebuffers");
+
+    for (unsigned int i = 0; i < vulkan_context.swapchain.image_count; i++) {
+        if (vulkan_context.swapchain.framebuffers[i].handle) {
+            vulkan_framebuffer_destroy(
+              &vulkan_context.swapchain.framebuffers[i]);
+        }
+    }
+    ofree(vulkan_context.swapchain.framebuffers);
 
     ilog("cleaning up graphics command buffers");
     for (unsigned int i = 0; i < vulkan_context.swapchain.image_count; i++) {

@@ -31,6 +31,13 @@ typedef struct {
     VulkanRenderPassState state;
 } VulkanRenderpass;
 
+typedef struct {
+    VkFramebuffer handle;
+    unsigned int attachment_count;
+    VkImageView *attachments;
+    VulkanRenderpass *renderpass;
+} VulkanFramebuffer;
+
 // swapchain support info
 typedef struct {
     VkSurfaceCapabilitiesKHR capabilities;
@@ -74,6 +81,8 @@ typedef struct {
     VkImageView *views;
 
     VulkanImage depth_attachment;
+
+    VulkanFramebuffer *framebuffers;
 } VulkanSwapchain;
 
 typedef enum {

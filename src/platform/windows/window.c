@@ -9,6 +9,13 @@
 HWND window_handle = nullptr;
 HINSTANCE window_hinstance = nullptr;
 
+void platform_get_window_size(unsigned int *width, unsigned int *height) {
+    RECT rect;
+    GetClientRect(window_handle, &rect);
+    *width = rect.right - rect.left;
+    *height = rect.bottom - rect.top;
+}
+
 LRESULT CALLBACK WindowProc(
   HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
