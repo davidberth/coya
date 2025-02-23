@@ -14,3 +14,5 @@
             assert(result == VK_SUCCESS);                                      \
         }                                                                      \
     }
+
+bool vulkan_result_is_success(VkResult result);
