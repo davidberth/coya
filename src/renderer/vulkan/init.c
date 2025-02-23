@@ -1,5 +1,7 @@
 #include "core/logger.h"
 #include "core/memory.h"
+#include "core/event.h"
+#include "renderer/renderer.h"
 #include "platform/platform.h"
 #include "platform/util.h"
 #include "types.h"
@@ -9,6 +11,7 @@
 #include "renderpass.h"
 #include "command_buffer.h"
 #include "framebuffer.h"
+#include "fence.h"
 
 extern VulkanContext vulkan_context;
 
@@ -94,6 +97,9 @@ bool renderer_init() {
     vulkan_context.allocator = nullptr;
     vulkan_context.graphics_command_buffers = nullptr;
     vulkan_context.swapchain.framebuffers = nullptr;
+    vulkan_context.framebuffer_resize_needed = false;
+
+    register_event_handler(EVENT_TYPE_RESIZE, renderer_on_resize);
 
     // grab the window width and height
     platform_get_window_size(
@@ -194,6 +200,40 @@ bool renderer_init() {
       &vulkan_context.swapchain, &vulkan_context.main_renderpass);
 
     create_command_buffers();
+
+    vulkan_context.image_available_semaphores = (VkSemaphore *)oalloc(
+      sizeof(VkSemaphore) * vulkan_context.swapchain.max_frames_in_flight,
+      MEMORY_CATEGORY_VULKAN);
+
+    vulkan_context.queue_complete_semaphores = (VkSemaphore *)oalloc(
+      sizeof(VkSemaphore) * vulkan_context.swapchain.max_frames_in_flight,
+      MEMORY_CATEGORY_VULKAN);
+
+    vulkan_context.in_flight_fences = (VulkanFence *)oalloc(
+      sizeof(VulkanFence) * vulkan_context.swapchain.max_frames_in_flight,
+      MEMORY_CATEGORY_VULKAN);
+
+    for (unsigned int i = 0; i < vulkan_context.swapchain.max_frames_in_flight;
+      ++i) {
+        VkSemaphoreCreateInfo semaphore_create_info = {
+          VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
+        vk_check(vkCreateSemaphore(vulkan_context.device.logical_device,
+          &semaphore_create_info, vulkan_context.allocator,
+          &vulkan_context.image_available_semaphores[i]));
+        vk_check(vkCreateSemaphore(vulkan_context.device.logical_device,
+          &semaphore_create_info, vulkan_context.allocator,
+          &vulkan_context.queue_complete_semaphores[i]));
+
+        // we start in a signaled state so we can render the first frame
+        vulkan_fence_create(true, &vulkan_context.in_flight_fences[i]);
+    }
+
+    vulkan_context.images_in_flight = (VulkanFence **)oalloc(
+      sizeof(VulkanFence *) * vulkan_context.swapchain.image_count,
+      MEMORY_CATEGORY_VULKAN);
+    for (unsigned int i = 0; i < vulkan_context.swapchain.image_count; i++) {
+        vulkan_context.images_in_flight[i] = nullptr;
+    }
 
     ilog("vulkan renderer initialized");
     return true;

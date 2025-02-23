@@ -26,10 +26,6 @@ void on_mouse_move(EventContext context) {
     ilog("mouse move: %d, %d", context.sint[0], context.sint[1]);
 }
 
-void on_resize(EventContext context) {
-    ilog("window resized: %d, %d", context.uint[0], context.uint[1]);
-}
-
 void on_input_down(EventContext context) {
     ilog("input down: %d", context.uint[0]);
 }
@@ -55,8 +51,7 @@ int main() {
     }
 
     register_event_handler(EVENT_TYPE_MOUSE_BUTTON, on_mouse_button);
-    // register_event_handler(EVENT_TYPE_MOUSE_MOVE, on_mouse_move);
-    register_event_handler(EVENT_TYPE_RESIZE, on_resize);
+
     register_event_handler(EVENT_TYPE_INPUT_DOWN, on_input_down);
     register_event_handler(EVENT_TYPE_INPUT_UP, on_input_up);
 

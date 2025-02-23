@@ -99,10 +99,17 @@ typedef struct {
     VulkanCommandBufferState state;
 } VulkanCommandBuffer;
 
+typedef struct {
+    VkFence handle;
+    bool is_signaled;
+} VulkanFence;
+
 // vulkan context
 typedef struct {
     unsigned int framebuffer_width;
     unsigned int framebuffer_height;
+
+    bool framebuffer_resize_needed;
 
     VkInstance instance;
     VulkanDevice device;
@@ -118,6 +125,13 @@ typedef struct {
     VulkanRenderpass main_renderpass;
 
     VulkanCommandBuffer *graphics_command_buffers;
+
+    VkSemaphore *image_available_semaphores;
+    VkSemaphore *queue_complete_semaphores;
+
+    unsigned int in_flight_fence_count;
+    VulkanFence *in_flight_fences;
+    VulkanFence **images_in_flight;
 
     int (*find_memory_index)(
       unsigned int type_filter, unsigned int property_flags);

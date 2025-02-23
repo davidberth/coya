@@ -6,11 +6,14 @@
 #include "renderpass.h"
 #include "command_buffer.h"
 #include "framebuffer.h"
+#include "fence.h"
 #include <vulkan/vulkan_core.h>
 
 extern VulkanContext vulkan_context;
 
 void renderer_cleanup() {
+    vkDeviceWaitIdle(vulkan_context.device.logical_device);
+
 #if defined(_DEBUG)
     dlog("cleaning up the vulkan debugger");
     if (vulkan_context.debug_messenger) {
@@ -23,6 +26,30 @@ void renderer_cleanup() {
           vulkan_context.allocator);
     }
 #endif
+
+    for (unsigned i = 0; i < vulkan_context.swapchain.max_frames_in_flight;
+      ++i) {
+        if (vulkan_context.image_available_semaphores[i]) {
+            vkDestroySemaphore(vulkan_context.device.logical_device,
+              vulkan_context.image_available_semaphores[i],
+              vulkan_context.allocator);
+            vulkan_context.image_available_semaphores[i] = nullptr;
+        }
+
+        if (vulkan_context.queue_complete_semaphores[i]) {
+            vkDestroySemaphore(vulkan_context.device.logical_device,
+              vulkan_context.queue_complete_semaphores[i],
+              vulkan_context.allocator);
+            vulkan_context.queue_complete_semaphores[i] = nullptr;
+        }
+        vulkan_fence_destroy(&vulkan_context.in_flight_fences[i]);
+    }
+
+    ilog("cleaning up fences and semaphores");
+    ofree(vulkan_context.image_available_semaphores);
+    ofree(vulkan_context.queue_complete_semaphores);
+    ofree(vulkan_context.in_flight_fences);
+    ofree(vulkan_context.images_in_flight);
 
     ilog("cleaning up swapchain framebuffers");
 

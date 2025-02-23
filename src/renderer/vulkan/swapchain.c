@@ -211,4 +211,7 @@ void vulkan_swapchain_present(VulkanSwapchain *swapchain,
     } else if (result != VK_SUCCESS) {
         flog("failed to present swap chain image");
     }
+
+    vulkan_context.current_frame =
+      (vulkan_context.current_frame + 1) % swapchain->max_frames_in_flight;
 }
