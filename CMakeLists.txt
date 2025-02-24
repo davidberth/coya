@@ -1,7 +1,11 @@
 ﻿cmake_minimum_required (VERSION 3.30)
 project (Coya LANGUAGES C VERSION 0.1.0)
 set(CMAKE_C_STANDARD 23)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if (CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-Werror=vla)
+endif()
 
 # variables
 set(RENDERER "Vulkan")

@@ -23,7 +23,7 @@ void vulkan_renderpass_create(VulkanRenderpass *out_renderpass, float x,
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 
     // attachments
-    unsigned int attachment_description_count = 2;
+    constexpr unsigned int attachment_description_count = 2;
     VkAttachmentDescription
       attachment_descriptions[attachment_description_count];
 

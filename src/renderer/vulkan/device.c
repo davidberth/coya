@@ -229,7 +229,8 @@ bool create_logical_device() {
         index_count++;
     if (!transfer_shares_graphics_queue)
         index_count++;
-    unsigned int indices[index_count];
+    unsigned int *indices = (unsigned int *)oalloc(
+      sizeof(unsigned int) * index_count, MEMORY_CATEGORY_VULKAN);
 
     indices[index++] = vulkan_context.device.graphics_queue_index;
     if (!present_shares_graphics_queue)
@@ -237,7 +238,9 @@ bool create_logical_device() {
     if (!transfer_shares_graphics_queue)
         indices[index++] = vulkan_context.device.transfer_queue_index;
 
-    VkDeviceQueueCreateInfo queue_create_infos[index_count];
+    VkDeviceQueueCreateInfo *queue_create_infos =
+      (VkDeviceQueueCreateInfo *)oalloc(
+        sizeof(VkDeviceQueueCreateInfo) * index_count, MEMORY_CATEGORY_VULKAN);
     for (unsigned int i = 0; i < index_count; i++) {
         queue_create_infos[i].sType =
           VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -293,6 +296,8 @@ bool create_logical_device() {
       &pool_create_info, vulkan_context.allocator,
       &vulkan_context.device.graphics_command_pool));
     ilog("graphics command pool created");
+    ofree(indices);
+    ofree(queue_create_infos);
 
     return true;
 }
