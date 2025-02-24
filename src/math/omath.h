@@ -232,7 +232,7 @@ inline float vec4_length_sq(vec4 a) {
 
 inline float vec4_length(vec4 a) { return osqrt(vec4_length_sq(a)); }
 
-inline vec4 vec4_normalize(vec4 *a) {
+inline void vec4_normalize(vec4 *a) {
     float inv_len = 1.0f / vec4_length(*a);
     a->x *= inv_len;
     a->y *= inv_len;
@@ -263,9 +263,7 @@ inline float vec4_distance(vec4 a, vec4 b) {
 inline vec2 vec2_from_vec3(vec3 a) { return (vec2){{a.x, a.y}}; }
 inline vec2 vec2_from_vec4(vec4 a) { return (vec2){{a.x, a.y}}; }
 inline vec3 vec3_from_vec2(vec2 a, float b) { return (vec3){{{a.x, a.y, b}}}; }
-inline vec3 vec3_from_vec4(vec4 a, float b) {
-    return (vec3){{{a.x, a.y, a.z, b}}};
-}
+inline vec3 vec3_from_vec4(vec4 a) { return (vec3){{{a.x, a.y, a.z}}}; }
 inline vec4 vec4_from_vec3(vec3 a, float b) {
     return (vec4){{{a.x, a.y, a.z, b}}};
 }
