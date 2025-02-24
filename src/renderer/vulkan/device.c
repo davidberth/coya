@@ -18,6 +18,10 @@ void vulkan_device_query_swapchain_support() {
       &vulkan_context.device.swapchain_support.format_count, nullptr));
 
     if (vulkan_context.device.swapchain_support.format_count != 0) {
+
+        if (vulkan_context.device.swapchain_support.formats) {
+            ofree(vulkan_context.device.swapchain_support.formats);
+        }
         vulkan_context.device.swapchain_support.formats =
           (VkSurfaceFormatKHR *)oalloc(
             sizeof(VkSurfaceFormatKHR) *
@@ -35,6 +39,9 @@ void vulkan_device_query_swapchain_support() {
       &vulkan_context.device.swapchain_support.present_mode_count, nullptr));
 
     if (vulkan_context.device.swapchain_support.present_mode_count != 0) {
+        if (vulkan_context.device.swapchain_support.present_modes) {
+            ofree(vulkan_context.device.swapchain_support.present_modes);
+        }
         vulkan_context.device.swapchain_support.present_modes =
           (VkPresentModeKHR *)oalloc(
             sizeof(VkPresentModeKHR) *

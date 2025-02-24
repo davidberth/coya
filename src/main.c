@@ -64,8 +64,11 @@ int main() {
     while (!platform_should_close()) {
 
         platform_poll_events();
-        renderer_begin_frame(0.0f);
-        renderer_end_frame(0.0f);
+        if (platform_is_window_showing()) {
+            if (renderer_begin_frame(0.0f)) {
+                renderer_end_frame(0.0f);
+            }
+        }
     }
     renderer_cleanup();
     platform_cleanup();

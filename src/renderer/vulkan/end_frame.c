@@ -1,9 +1,9 @@
 #include "renderer/renderer.h"
-#include "renderer/vulkan/types.h"
-#include "renderer/vulkan/renderpass.h"
-#include "renderer/vulkan/command_buffer.h"
-#include "renderer/vulkan/fence.h"
-#include "renderer/vulkan/swapchain.h"
+#include "types.h"
+#include "renderpass.h"
+#include "command_buffer.h"
+#include "fence.h"
+#include "swapchain.h"
 #include <vulkan/vulkan_core.h>
 #include "core/logger.h"
 
@@ -50,8 +50,7 @@ bool renderer_end_frame(float delta_time) {
         vulkan_context.in_flight_fences[vulkan_context.current_frame].handle);
 
     if (result != VK_SUCCESS) {
-        flog(
-          "vkQueueSubmit failed with result: %s", vulkan_result_string(result));
+        flog("vkQueueSubmit failed");
         return false;
     }
 

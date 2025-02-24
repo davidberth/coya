@@ -10,6 +10,9 @@
 #include "util.h"
 
 extern VulkanContext vulkan_context;
+extern void create_command_buffers();
+extern void regenerate_framebuffers(
+  VulkanSwapchain *swapchain, VulkanRenderpass *renderpass);
 
 bool recreate_swapchain() {
     if (vulkan_context.recreating_swapchain) {
@@ -24,14 +27,16 @@ bool recreate_swapchain() {
 
     vulkan_context.recreating_swapchain = true;
 
+    vkDeviceWaitIdle(vulkan_context.device.logical_device);
+
     for (unsigned int i = 0; i < vulkan_context.swapchain.image_count; ++i) {
         vulkan_context.images_in_flight[i] = VK_NULL_HANDLE;
     }
 
-    // TODO: remove these? (only happens on resize)
     vulkan_device_query_swapchain_support();
     vulkan_device_detect_depth_format();
 
+    ilog("recreating swapchain");
     vulkan_swapchain_recreate(vulkan_context.framebuffer_width,
       vulkan_context.framebuffer_height, &vulkan_context.swapchain);
 
@@ -50,14 +55,13 @@ bool recreate_swapchain() {
     vulkan_context.main_renderpass.w = vulkan_context.framebuffer_width;
     vulkan_context.main_renderpass.h = vulkan_context.framebuffer_height;
 
-    vulkan_framebuffer_create(vulkan_context.main_renderpass,
-      vulkan_context.framebuffer_width, vulkan_context.framebuffer_height,
-      vulkan_context.swapchain.frame_buffers, attachment_count, attachments,
-      &vulkan_context.swapchain.framebuffers[i]);
+    regenerate_framebuffers(
+      &vulkan_context.swapchain, &vulkan_context.main_renderpass);
 
-    create_command_buffers(&vulkan_context.swapchain);
+    create_command_buffers();
 
     vulkan_context.recreating_swapchain = false;
+    return true;
 }
 
 bool renderer_begin_frame(float delta_time) {
@@ -99,11 +103,20 @@ bool renderer_begin_frame(float delta_time) {
     }
 
     if (!vulkan_swapchain_acquire_next_image_index(&vulkan_context.swapchain,
-          UINT64_MAX,
+          4294967295,
           vulkan_context
             .image_available_semaphores[vulkan_context.current_frame],
           0, &vulkan_context.image_index)) {
         return false;
+    }
+
+    if (vulkan_context.images_in_flight[vulkan_context.image_index] != NULL) {
+        if (!vulkan_fence_wait(
+              vulkan_context.images_in_flight[vulkan_context.image_index],
+              UINT64_MAX)) {
+            flog("failed to wait for image in flight fence");
+            return false;
+        }
     }
 
     VulkanCommandBuffer *command_buffer =

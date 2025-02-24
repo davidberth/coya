@@ -8,6 +8,9 @@
 
 HWND window_handle = nullptr;
 HINSTANCE window_hinstance = nullptr;
+bool window_showing = false;
+
+bool platform_is_window_showing() { return window_showing; }
 
 void platform_get_window_size(unsigned int *width, unsigned int *height) {
     RECT rect;
@@ -21,6 +24,7 @@ LRESULT CALLBACK WindowProc(
     switch (uMsg) {
     case WM_CLOSE:
         DestroyWindow(hwnd);
+        window_showing = false;
         return 0;
     case WM_DESTROY:
         PostQuitMessage(0);
@@ -84,6 +88,7 @@ bool platform_init(int width, int height, char *title) {
     // set our global hinstance variable
     window_hinstance = wc.hInstance;
     ShowWindow(window_handle, SW_SHOW);
+    window_showing = true;
 
     return true;
 }

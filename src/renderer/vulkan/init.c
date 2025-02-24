@@ -98,6 +98,8 @@ bool renderer_init() {
     vulkan_context.graphics_command_buffers = nullptr;
     vulkan_context.swapchain.framebuffers = nullptr;
     vulkan_context.framebuffer_resize_needed = false;
+    vulkan_context.device.swapchain_support.formats = nullptr;
+    vulkan_context.device.swapchain_support.present_modes = nullptr;
 
     register_event_handler(EVENT_TYPE_RESIZE, renderer_on_resize);
 
