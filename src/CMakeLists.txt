@@ -1,7 +1,8 @@
 file(GLOB core_sources "core/*.c")
 file(GLOB input_sources "input/*.c")
+file(GLOB math_sources "math/*.c")
 
-set(all_c_sources main.c ${core_sources} ${input_sources} ${renderer_sources})
+set(all_c_sources main.c ${core_sources} ${input_sources} ${math_sources})
 
 if(WIN32)
     file(GLOB vulkan_sources "renderer/vulkan/*.c")
