@@ -151,7 +151,7 @@ inline float vec3_length_sq(vec3 a) {
 
 inline float vec3_length(vec3 a) { return osqrt(vec3_length_sq(a)); }
 
-inline vec3 vec3_normalize(vec3 *a) {
+inline float vec3_normalize(vec3 *a) {
     float inv_len = 1.0f / vec3_length(*a);
     a->x *= inv_len;
     a->y *= inv_len;
