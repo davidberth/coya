@@ -34,6 +34,12 @@ LRESULT CALLBACK WindowProc(
         context.uint[0] = LOWORD(lParam);
         context.uint[1] = HIWORD(lParam);
         trigger_event(EVENT_TYPE_RESIZE, context);
+        if (wParam == SIZE_MINIMIZED) {
+            window_showing = false;
+        } else if (wParam == SIZE_RESTORED) {
+            window_showing = true;
+        }
+
         return 0;
     }
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
