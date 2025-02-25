@@ -104,6 +104,26 @@ typedef struct {
     bool is_signaled;
 } VulkanFence;
 
+// shader stage
+typedef struct {
+    VkShaderModuleCreateInfo create_info;
+    VkShaderModule handle;
+    VkPipelineShaderStageCreateInfo stage_info;
+} VulkanShaderStage;
+
+// pipeline
+typedef struct {
+    VkPipeline handle;
+    VkPipelineLayout layout;
+} VulkanPipeline;
+
+constexpr int object_shader_stage_count = 2;
+// shader
+typedef struct {
+    VulkanShaderStage stages[object_shader_stage_count];
+    VulkanPipeline pipeline;
+} VulkanShader;
+
 // vulkan context
 typedef struct {
     unsigned int framebuffer_width;
