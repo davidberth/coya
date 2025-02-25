@@ -25,3 +25,5 @@ add_custom_target(copy_compile_commands ALL
                     ${CMAKE_BINARY_DIR}/compile_commands.json
                     ${CMAKE_BINARY_DIR}/../compile_commands.json
 )
+
+add_subdirectory("shaders")

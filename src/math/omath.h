@@ -151,7 +151,7 @@ inline float vec3_length_sq(vec3 a) {
 
 inline float vec3_length(vec3 a) { return osqrt(vec3_length_sq(a)); }
 
-inline float vec3_normalize(vec3 *a) {
+inline void vec3_normalize(vec3 *a) {
     float inv_len = 1.0f / vec3_length(*a);
     a->x *= inv_len;
     a->y *= inv_len;
@@ -269,4 +269,73 @@ inline vec4 vec4_from_vec3(vec3 a, float b) {
 }
 inline vec4 vec4_from_vec2(vec2 a, float b, float c) {
     return (vec4){{{a.x, a.y, b, c}}};
+}
+
+typedef struct {
+    union {
+        struct {
+            float m00, m01, m02; // store matrix elements in row major order
+            float m10, m11, m12; // store matrix elements in row major order
+            float m20, m21, m22; // store matrix elements in row major order
+        };
+        float m[9]; // store matrix elements in row major order
+    };
+} matrix3;
+
+matrix3 matrix3x3_multiply(matrix3 a, matrix3 b) {
+    matrix3 result;
+
+    result.m00 = a.m00 * b.m00 + a.m01 * b.m10 + a.m02 * b.m20;
+    result.m01 = a.m00 * b.m01 + a.m01 * b.m11 + a.m02 * b.m21;
+    result.m02 = a.m00 * b.m02 + a.m01 * b.m12 + a.m02 * b.m22;
+
+    result.m10 = a.m10 * b.m00 + a.m11 * b.m10 + a.m12 * b.m20;
+    result.m11 = a.m10 * b.m01 + a.m11 * b.m11 + a.m12 * b.m21;
+    result.m12 = a.m10 * b.m02 + a.m11 * b.m12 + a.m12 * b.m22;
+
+    result.m20 = a.m20 * b.m00 + a.m21 * b.m10 + a.m22 * b.m20;
+    result.m21 = a.m20 * b.m01 + a.m21 * b.m11 + a.m22 * b.m21;
+    result.m22 = a.m20 * b.m02 + a.m21 * b.m12 + a.m22 * b.m22;
+
+    return result;
+}
+
+matrix3 matrix3_identity() {
+    matrix3 result = {0};
+    result.m00 = 1.0f;
+    result.m11 = 1.0f;
+    result.m22 = 1.0f;
+    return result;
+}
+
+matrix3 matrix3_rotation(float angle) {
+    matrix3 result = {0};
+    float c = ocos(angle);
+    float s = osin(angle);
+
+    result.m00 = c;
+    result.m01 = -s;
+    result.m10 = s;
+    result.m11 = c;
+    result.m22 = 1.0f;
+
+    return result;
+}
+
+matrix3 matrix3_scale(float x, float y) {
+    matrix3 result = {0};
+    result.m00 = x;
+    result.m11 = y;
+    result.m22 = 1.0f;
+    return result;
+}
+
+matrix3 matrix3_translation(float x, float y) {
+    matrix3 result = {0};
+    result.m00 = 1.0f;
+    result.m11 = 1.0f;
+    result.m20 = x;
+    result.m21 = y;
+    result.m22 = 1.0f;
+    return result;
 }
