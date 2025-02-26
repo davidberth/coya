@@ -1,24 +1,35 @@
 #include "logger.h"
+#include "core/logger.h"
 #include <string.h>
 #include <sys\timeb.h>
 #include <stdio.h>
 
 static struct timeb start;
-
+#if defined(_DEBUG)
+static log_level current_level = LOG_INFO;
+#else
+static log_level current_level = LOG_MEMORY;
+#endif
 void init_logger() { ftime(&start); }
 
-void log_message(log_level level, const char *message, const char *file,
-                 int line, ...) {
+void set_logger_level(log_level level) {}
+
+void log_message(
+  log_level level, const char *message, const char *file, int line, ...) {
+
+    if (level < current_level) {
+        return;
+    }
     va_list args;
     va_start(args, line);
     struct timeb current;
     ftime(&current);
-    float time_difference = (current.time - start.time) +
-                            (current.millitm - start.millitm) / 1000.0f;
+    float time_difference =
+      (current.time - start.time) + (current.millitm - start.millitm) / 1000.0f;
 
-    static const char *level_strings[] = {
-        "\033[0;32m[INFO]    ", "\033[0;34m[MEMORY]  ", "[DEBUG]   ",
-        "\033[0;33m[WARNING] ", "\033[0;31m[ERROR]   ", "\033[0;31m[FATAL]   "};
+    static const char *level_strings[] = {"\033[0;32m[INFO]    ",
+      "\033[0;34m[MEMORY]  ", "[DEBUG]   ", "\033[0;33m[WARNING] ",
+      "\033[0;31m[ERROR]   ", "\033[0;31m[FATAL]   "};
     printf("%s", level_strings[level]);
 
     size_t file_length = strlen(file);

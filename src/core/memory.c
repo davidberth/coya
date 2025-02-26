@@ -20,6 +20,7 @@ static const char *memory_category_names[] = {
 };
 
 // debug version of allocation that stores file and line info
+#if defined(_DEBUG)
 void *oalloc_debug(
   size_t size, MemoryCategory category, const char *file, int line) {
     mlog("allocating %zu bytes in category %s at %s:%d", size,
@@ -46,10 +47,12 @@ void *oalloc_debug(
     memory_totals[category] += size;
     return user_ptr;
 }
+#endif
 
+#if defined(NDEBUG)
 // release version of allocation without debug info
 void *oalloc_release(size_t size, MemoryCategory category) {
-    mlog("allocating %zu bytes in category %s", size,
+    mlog("+ allocating %zu bytes in category %s", size,
       memory_category_names[category]);
     size_t total_size = sizeof(Opointer) + size;
 
@@ -65,6 +68,7 @@ void *oalloc_release(size_t size, MemoryCategory category) {
 
     return (void *)((char *)block + sizeof(Opointer));
 }
+#endif
 
 // free memory previously allocated
 void ofree(void *pointer) {
@@ -89,7 +93,7 @@ void ofree(void *pointer) {
     }
 #endif
 
-    mlog("freeing %zu bytes in category %s", opointer_ptr->allocation_size,
+    mlog("- freeing %zu bytes in category %s", opointer_ptr->allocation_size,
       memory_category_names[opointer_ptr->category]);
     free((void *)opointer_ptr);
 }
