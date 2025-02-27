@@ -4,6 +4,7 @@ typedef enum {
     MEMORY_CATEGORY_VULKAN,
     MEMORY_CATEGORY_GAME,
     MEMORY_CATEGORY_SCENEGRAPH,
+    MEMORY_CATEGORY_STRING,
     MEMORY_CATEGORY_COUNT // number of memory categories
 } MemoryCategory;
 

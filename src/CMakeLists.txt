@@ -1,13 +1,15 @@
 file(GLOB core_sources "core/*.c")
 file(GLOB input_sources "input/*.c")
 file(GLOB math_sources "math/*.c")
+file(GLOB platform_sources "platform/*.c")
 
-set(all_c_sources main.c ${core_sources} ${input_sources} ${math_sources})
+set(all_c_sources main.c ${core_sources} ${input_sources} ${math_sources} ${platform_sources})
 
 if(WIN32)
     file(GLOB vulkan_sources "renderer/vulkan/*.c")
     file(GLOB platform_windows_sources "platform/windows/*.c")
-    set(all_c_sources ${all_c_sources} ${vulkan_sources} ${platform_windows_sources})
+    file(GLOB shader_sources "renderer/vulkan/shader/*.c")
+    set(all_c_sources ${all_c_sources} ${vulkan_sources} ${platform_windows_sources} ${shader_sources})
 endif()
 
 add_executable(coya

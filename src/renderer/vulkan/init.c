@@ -3,6 +3,7 @@
 #include "core/event.h"
 #include "renderer/renderer.h"
 #include "platform/platform.h"
+#include "renderer/vulkan/shader/shader.h"
 #include "platform/util.h"
 #include "types.h"
 #include "util.h"
@@ -12,6 +13,9 @@
 #include "command_buffer.h"
 #include "framebuffer.h"
 #include "fence.h"
+
+// shader
+#include "shader/shader.h"
 
 extern VulkanContext vulkan_context;
 
@@ -235,6 +239,11 @@ bool renderer_init() {
       MEMORY_CATEGORY_VULKAN);
     for (unsigned int i = 0; i < vulkan_context.swapchain.image_count; i++) {
         vulkan_context.images_in_flight[i] = nullptr;
+    }
+
+    if (!shader_create(&vulkan_context.main_shader)) {
+        elog("failed to create main shader");
+        return false;
     }
 
     ilog("vulkan renderer initialized");

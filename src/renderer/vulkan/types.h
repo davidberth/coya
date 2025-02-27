@@ -156,6 +156,8 @@ typedef struct {
     int (*find_memory_index)(
       unsigned int type_filter, unsigned int property_flags);
 
+    VulkanShader main_shader;
+
 #if defined(_DEBUG)
     VkDebugUtilsMessengerEXT debug_messenger;
 #endif

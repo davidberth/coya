@@ -17,6 +17,7 @@ static const char *memory_category_names[] = {
   "Vulkan",
   "Game",
   "SceneGraph",
+  "String",
 };
 
 // debug version of allocation that stores file and line info

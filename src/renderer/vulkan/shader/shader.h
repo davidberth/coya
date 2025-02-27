@@ -1,7 +1,6 @@
 #pragma once
 
 #include "renderer/vulkan/types.h"
-#include "renderer/renderer.h"
 
 bool shader_create(VulkanShader *out_shader);
 
