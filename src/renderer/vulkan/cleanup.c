@@ -7,6 +7,7 @@
 #include "command_buffer.h"
 #include "framebuffer.h"
 #include "fence.h"
+#include "shader/shader.h"
 #include <vulkan/vulkan_core.h>
 
 extern VulkanContext vulkan_context;
@@ -14,6 +15,7 @@ extern VulkanContext vulkan_context;
 void renderer_cleanup() {
     vkDeviceWaitIdle(vulkan_context.device.logical_device);
 
+    shader_destroy(&vulkan_context.main_shader);
 #if defined(_DEBUG)
     dlog("cleaning up the vulkan debugger");
     if (vulkan_context.debug_messenger) {

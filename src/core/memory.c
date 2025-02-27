@@ -24,8 +24,8 @@ static const char *memory_category_names[] = {
 #if defined(_DEBUG)
 void *oalloc_debug(
   size_t size, MemoryCategory category, const char *file, int line) {
-    mlog("allocating %zu bytes in category %s at %s:%d", size,
-      memory_category_names[category], file, line);
+    mlog("+ allocating %zu bytes in category %s", size,
+      memory_category_names[category]);
     size_t total_size = sizeof(Opointer) + size;
 
     void *block = malloc(total_size);

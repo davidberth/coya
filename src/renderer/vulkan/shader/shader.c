@@ -28,6 +28,12 @@ bool shader_create(VulkanShader *out_shader) {
     return true;
 }
 
-void shader_destroy(VulkanShader *shader) {}
+void shader_destroy(VulkanShader *shader) {
+    for (unsigned int i = 0; i < object_shader_stage_count; ++i) {
+        vkDestroyShaderModule(vulkan_context.device.logical_device,
+          shader->stages[i].handle, vulkan_context.allocator);
+        shader->stages[i].handle = 0;
+    }
+}
 
 void shader_use(VulkanShader *shader) {}
