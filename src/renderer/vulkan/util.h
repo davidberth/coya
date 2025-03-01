@@ -11,7 +11,7 @@
         VkResult result = expr;                                                \
         if (result != VK_SUCCESS) {                                            \
             elog("vulkan error: %s", string_VkResult(result));                 \
-            assert(result == VK_SUCCESS);                                      \
+            assert(false);                                                     \
         }                                                                      \
     }
 

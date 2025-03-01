@@ -107,7 +107,7 @@ typedef struct {
 // shader stage
 typedef struct {
     VkShaderModuleCreateInfo create_info;
-    VkShaderModule handle;
+    VkShaderModule shader_handle;
     VkPipelineShaderStageCreateInfo stage_info;
 } VulkanShaderStage;
 

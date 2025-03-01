@@ -41,15 +41,15 @@ bool create_shader_module(const char *name, const char *type_str,
 
     vk_check(vkCreateShaderModule(vulkan_context.device.logical_device,
       &shader_stages[stage_index].create_info, vulkan_context.allocator,
-      &shader_stages[stage_index].handle));
+      &shader_stages[stage_index].shader_handle));
 
-    memset(&shader_stages[stage_index].create_info, 0,
+    memset(&shader_stages[stage_index].stage_info, 0,
       sizeof(VkPipelineShaderStageCreateInfo));
     shader_stages[stage_index].stage_info.sType =
       VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     shader_stages[stage_index].stage_info.stage = shader_stage_flag;
     shader_stages[stage_index].stage_info.module =
-      shader_stages[stage_index].handle;
+      shader_stages[stage_index].shader_handle;
     shader_stages[stage_index].stage_info.pName = "main";
 
     if (file_buffer) {

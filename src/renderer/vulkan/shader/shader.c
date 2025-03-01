@@ -29,10 +29,18 @@ bool shader_create(VulkanShader *out_shader) {
 }
 
 void shader_destroy(VulkanShader *shader) {
+    // log that we're destroying shader modules
+    dlog("destroying shader modules");
+
     for (unsigned int i = 0; i < object_shader_stage_count; ++i) {
-        vkDestroyShaderModule(vulkan_context.device.logical_device,
-          shader->stages[i].handle, vulkan_context.allocator);
-        shader->stages[i].handle = 0;
+        if (shader->stages[i].shader_handle != VK_NULL_HANDLE) {
+            vkDestroyShaderModule(vulkan_context.device.logical_device,
+              shader->stages[i].shader_handle, vulkan_context.allocator);
+            shader->stages[i].shader_handle = VK_NULL_HANDLE;
+
+            // make sure to clear the stage_info module reference as well
+            shader->stages[i].stage_info.module = VK_NULL_HANDLE;
+        }
     }
 }
 
