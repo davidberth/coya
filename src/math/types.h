@@ -50,3 +50,7 @@ typedef struct {
 } vec4;
 
 typedef float mat3x3[9];
+
+typedef struct {
+    vec3 position;
+} Vertex3D;

@@ -25,6 +25,24 @@ bool shader_create(VulkanShader *out_shader) {
       BUILTIN_SHADER_NAME_OBJECT);
 
     // TODO: descriptors
+
+    // pipeline creation
+    VkViewport viewport;
+    viewport.x = 0.0f;
+    viewport.y = (float)(vulkan_context.swapchain.extent.height);
+    viewport.width = (float)(vulkan_context.swapchain.extent.width);
+    viewport.height = -(float)(vulkan_context.swapchain.extent.height);
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+
+    // scissor
+    VkRect2D scissor;
+    scissor.offset.x = scissor.offset.y = 0;
+    scissor.extent.width = vulkan_context.framebuffer_width;
+    scissor.extent.height = vulkan_context.framebuffer_height;
+
+    // attributes
+
     return true;
 }
 
