@@ -2,7 +2,10 @@
 #include "core/logger.h"
 #include "renderer/vulkan/types.h"
 #include "renderer/vulkan/shader_utils.h"
-
+#include "renderer/vulkan/pipeline.h"
+#include <vulkan/vulkan_core.h>
+#include "math/types.h"
+#include <string.h>
 #define BUILTIN_SHADER_NAME_OBJECT "polygon"
 
 extern VulkanContext vulkan_context;
@@ -29,9 +32,9 @@ bool shader_create(VulkanShader *out_shader) {
     // pipeline creation
     VkViewport viewport;
     viewport.x = 0.0f;
-    viewport.y = (float)(vulkan_context.swapchain.extent.height);
-    viewport.width = (float)(vulkan_context.swapchain.extent.width);
-    viewport.height = -(float)(vulkan_context.swapchain.extent.height);
+    viewport.y = (float)(vulkan_context.framebuffer_height);
+    viewport.width = (float)(vulkan_context.framebuffer_width);
+    viewport.height = -(float)(vulkan_context.framebuffer_height);
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
@@ -42,14 +45,45 @@ bool shader_create(VulkanShader *out_shader) {
     scissor.extent.height = vulkan_context.framebuffer_height;
 
     // attributes
+    unsigned int offset = 0;
+    constexpr int attribute_count = 1;
+    VkVertexInputAttributeDescription attribute_descriptions[attribute_count];
+    VkFormat formats[attribute_count] = {VK_FORMAT_R32G32B32_SFLOAT};
+    unsigned int sizes[attribute_count] = {sizeof(vec3)};
+    for (unsigned int i = 0; i < attribute_count; ++i) {
+        attribute_descriptions[i].binding = 0;
+        attribute_descriptions[i].location = i;
+        attribute_descriptions[i].format = formats[i];
+        attribute_descriptions[i].offset = offset;
+        offset += sizes[i];
+    }
+
+    VkPipelineShaderStageCreateInfo
+      stage_create_infos[object_shader_stage_count];
+    memset(stage_create_infos, 0, sizeof(stage_create_infos));
+    for (unsigned int i = 0; i < object_shader_stage_count; ++i) {
+        stage_create_infos[i].sType =
+          VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        stage_create_infos[i].sType = out_shader->stages[i].stage_info.sType;
+        stage_create_infos[i] = out_shader->stages[i].stage_info;
+    }
+
+    if (!vulkan_graphics_pipeline_create(&vulkan_context.main_renderpass,
+          attribute_count, attribute_descriptions, 0, 0,
+          object_shader_stage_count, stage_create_infos, viewport, scissor,
+          false, &out_shader->pipeline)) {
+        elog("Unable to create graphics pipeline");
+        return false;
+    }
 
     return true;
 }
 
 void shader_destroy(VulkanShader *shader) {
     // log that we're destroying shader modules
-    dlog("destroying shader modules");
+    vulkan_pipeline_destroy(&shader->pipeline);
 
+    dlog("destroying shader modules");
     for (unsigned int i = 0; i < object_shader_stage_count; ++i) {
         if (shader->stages[i].shader_handle != VK_NULL_HANDLE) {
             vkDestroyShaderModule(vulkan_context.device.logical_device,

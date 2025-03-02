@@ -1,7 +1,6 @@
 #include "pipeline.h"
 #include "util.h"
 #include "math/types.h"
-#include "core/memory.h"
 #include "core/logger.h"
 #include <vulkan/vulkan_core.h>
 
@@ -141,6 +140,7 @@ bool vulkan_graphics_pipeline_create(VulkanRenderpass *renderpass,
     pipeline_create_info.pTessellationState = nullptr;
 
     pipeline_create_info.layout = out_pipeline->layout;
+    pipeline_create_info.renderPass = renderpass->handle;
     pipeline_create_info.subpass = 0;
     pipeline_create_info.basePipelineHandle = VK_NULL_HANDLE;
     pipeline_create_info.basePipelineIndex = -1;
