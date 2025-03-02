@@ -13,9 +13,12 @@
 #include "command_buffer.h"
 #include "framebuffer.h"
 #include "fence.h"
+#include "math/types.h"
+#include "buffer.h"
 
 // shader
 #include "shader/shader.h"
+#include <vulkan/vulkan_core.h>
 
 extern VulkanContext vulkan_context;
 
@@ -53,6 +56,34 @@ int find_memory_index(unsigned int type_filter, unsigned int property_flags) {
     wlog("unable to find suitable memory type");
 
     return -1;
+}
+
+bool create_buffers() {
+    ilog("creating vertex and index buffers");
+    VkMemoryPropertyFlagBits memory_prop_flags =
+      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+
+    constexpr unsigned int vertex_buffer_size = sizeof(Vertex3D) * 100;
+    if (!vulkan_buffer_create(vertex_buffer_size,
+          VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT |
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+          memory_prop_flags, true, &vulkan_context.main_vertex_buffer)) {
+        elog("failed to create vertex buffer");
+        return false;
+    }
+    vulkan_context.geometry_vertex_offset = 0;
+
+    constexpr unsigned int index_buffer_size = sizeof(uint32_t) * 100;
+    if (!vulkan_buffer_create(index_buffer_size,
+          VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT |
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+          memory_prop_flags, true, &vulkan_context.main_index_buffer)) {
+        elog("failed to create index buffer");
+        return false;
+    }
+    vulkan_context.geometry_index_offset = 0;
+
+    return true;
 }
 
 void create_command_buffers() {
@@ -243,6 +274,11 @@ bool renderer_init() {
 
     if (!shader_create(&vulkan_context.main_shader)) {
         elog("failed to create main shader");
+        return false;
+    }
+
+    if (!create_buffers()) {
+        elog("failed to create buffers");
         return false;
     }
 

@@ -8,12 +8,16 @@
 #include "framebuffer.h"
 #include "fence.h"
 #include "shader/shader.h"
+#include "buffer.h"
 #include <vulkan/vulkan_core.h>
 
 extern VulkanContext vulkan_context;
 
 void renderer_cleanup() {
     vkDeviceWaitIdle(vulkan_context.device.logical_device);
+
+    vulkan_buffer_destroy(&vulkan_context.main_vertex_buffer);
+    vulkan_buffer_destroy(&vulkan_context.main_index_buffer);
 
     shader_destroy(&vulkan_context.main_shader);
 #if defined(_DEBUG)

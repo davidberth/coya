@@ -38,6 +38,16 @@ typedef struct {
     VulkanRenderpass *renderpass;
 } VulkanFramebuffer;
 
+typedef struct {
+    unsigned int total_size;
+    VkBuffer handle;
+    VkBufferUsageFlagBits usage;
+    bool is_locked;
+    VkDeviceMemory memory;
+    int memory_index;
+    unsigned int memory_property_flags;
+} VulkanBuffer;
+
 // swapchain support info
 typedef struct {
     VkSurfaceCapabilitiesKHR capabilities;
@@ -144,6 +154,9 @@ typedef struct {
     bool recreating_swapchain;
     VulkanRenderpass main_renderpass;
 
+    VulkanBuffer main_vertex_buffer;
+    VulkanBuffer main_index_buffer;
+
     VulkanCommandBuffer *graphics_command_buffers;
 
     VkSemaphore *image_available_semaphores;
@@ -157,6 +170,9 @@ typedef struct {
       unsigned int type_filter, unsigned int property_flags);
 
     VulkanShader main_shader;
+
+    unsigned int geometry_vertex_offset;
+    unsigned int geometry_index_offset;
 
 #if defined(_DEBUG)
     VkDebugUtilsMessengerEXT debug_messenger;
