@@ -41,6 +41,21 @@ VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_callback(
     return VK_FALSE;
 }
 
+void upload_data_range(VkCommandPool pool, VkFence fence, VkQueue queue,
+  VulkanBuffer *buffer, unsigned int offset, unsigned int size, void *data) {
+    VkBufferUsageFlags flags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                               VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+    VulkanBuffer staging;
+    vulkan_buffer_create(
+      size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, flags, true, &staging);
+
+    vulkan_buffer_load_data(&staging, 0, size, 0, data);
+    vulkan_buffer_copy_to(
+      pool, fence, queue, staging.handle, 0, buffer->handle, offset, size);
+
+    vulkan_buffer_destroy(&staging);
+}
+
 int find_memory_index(unsigned int type_filter, unsigned int property_flags) {
     VkPhysicalDeviceMemoryProperties memory_properties;
     vkGetPhysicalDeviceMemoryProperties(
@@ -281,6 +296,39 @@ bool renderer_init() {
         elog("failed to create buffers");
         return false;
     }
+
+    // TODO: temporary test code
+    constexpr unsigned int vert_count = 4;
+    Vertex3D verts[vert_count];
+
+    verts[0].position.x = 0.0f;
+    verts[0].position.y = -0.5f;
+    verts[0].position.z = 0.0f;
+
+    verts[1].position.x = 0.5f;
+    verts[1].position.y = 0.5f;
+    verts[1].position.z = 0.0f;
+
+    verts[2].position.x = 0.0f;
+    verts[2].position.y = 0.5f;
+    verts[2].position.z = 0.0f;
+
+    verts[3].position.x = 0.5f;
+    verts[3].position.y = -0.5f;
+    verts[3].position.z = 0.0f;
+
+    constexpr unsigned int index_count = 6;
+    unsigned int indices[index_count] = {0, 1, 2, 0, 3, 1};
+
+    upload_data_range(vulkan_context.device.graphics_command_pool, 0,
+      vulkan_context.device.graphics_queue, &vulkan_context.main_vertex_buffer,
+      0, sizeof(Vertex3D) * vert_count, verts);
+
+    upload_data_range(vulkan_context.device.graphics_command_pool, 0,
+      vulkan_context.device.graphics_queue, &vulkan_context.main_index_buffer,
+      0, sizeof(uint32_t) * index_count, indices);
+
+    // TODO: this is temporary code
 
     ilog("vulkan renderer initialized");
     return true;

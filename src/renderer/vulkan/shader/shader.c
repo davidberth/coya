@@ -96,4 +96,8 @@ void shader_destroy(VulkanShader *shader) {
     }
 }
 
-void shader_use(VulkanShader *shader) {}
+void shader_use(VulkanShader *shader) {
+    unsigned int image_index = vulkan_context.image_index;
+    vulkan_pipeline_bind(&vulkan_context.graphics_command_buffers[image_index],
+      VK_PIPELINE_BIND_POINT_GRAPHICS, &shader->pipeline);
+}

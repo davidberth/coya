@@ -7,3 +7,4 @@ void platform_cleanup();
 void platform_get_window_size(unsigned int *width, unsigned int *height);
 bool platform_is_window_showing();
 char *platform_set_to_root_directory();
+double platform_get_time();

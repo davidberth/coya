@@ -8,6 +8,7 @@
 #include "renderpass.h"
 #include "framebuffer.h"
 #include "util.h"
+#include "shader/shader.h"
 
 extern VulkanContext vulkan_context;
 extern void create_command_buffers();
@@ -147,5 +148,16 @@ bool renderer_begin_frame(float delta_time) {
     vulkan_renderpass_begin(command_buffer, &vulkan_context.main_renderpass,
       vulkan_context.swapchain.framebuffers[vulkan_context.image_index].handle);
 
+    // TODO: This is temporary test code to get us running
+    shader_use(&vulkan_context.main_shader);
+    VkDeviceSize offsets[1] = {0};
+    vkCmdBindVertexBuffers(command_buffer->handle, 0, 1,
+      &vulkan_context.main_vertex_buffer.handle, (VkDeviceSize *)offsets);
+
+    vkCmdBindIndexBuffer(command_buffer->handle,
+      vulkan_context.main_index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
+
+    vkCmdDrawIndexed(command_buffer->handle, 6, 1, 0, 0, 0);
+    // TODO: end of temporary test code
     return true;
 }

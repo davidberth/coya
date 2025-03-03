@@ -65,6 +65,24 @@ int main() {
 
         platform_poll_events();
         if (platform_is_window_showing()) {
+
+            static double previous_time = 0.0;
+            static int frame_count = 0;
+            static double elapsed_time = 0.0;
+
+            double current_time = platform_get_time();
+            double delta_time = current_time - previous_time;
+            previous_time = current_time;
+
+            frame_count++;
+            elapsed_time += delta_time;
+
+            if (elapsed_time >= 2.0) {
+                double framerate = frame_count / elapsed_time;
+                dlog("framerate: %.2f fps", framerate);
+                frame_count = 0;
+                elapsed_time = 0.0;
+            }
             if (renderer_begin_frame(0.0f)) {
                 renderer_end_frame(0.0f);
             }
