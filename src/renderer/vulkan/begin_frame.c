@@ -128,9 +128,9 @@ bool renderer_begin_frame(float delta_time) {
 
     VkViewport viewport;
     viewport.x = 0.0f;
-    viewport.y = (float)vulkan_context.framebuffer_height;
+    viewport.y = 0.0f;
     viewport.width = (float)vulkan_context.framebuffer_width;
-    viewport.height = -(float)vulkan_context.framebuffer_height;
+    viewport.height = (float)vulkan_context.framebuffer_height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
