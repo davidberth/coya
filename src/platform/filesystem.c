@@ -28,7 +28,8 @@ bool filesystem_open(
         return false;
     }
 
-    FILE *file = fopen(path, mode_str);
+    FILE *file;
+    fopen_s(&file, path, mode_str);
     if (!file) {
         flog("Failed to open file '%s'", path);
         return false;
