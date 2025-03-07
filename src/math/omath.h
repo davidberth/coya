@@ -271,7 +271,7 @@ inline vec4 vec4_from_vec2(vec2 a, float b, float c) {
     return (vec4){{{a.x, a.y, b, c}}};
 }
 
-mat4 mat4_identity() {
+inline mat4 mat4_identity() {
     mat4 result = {0};
     result.m00 = 1.0f;
     result.m11 = 1.0f;
@@ -280,7 +280,7 @@ mat4 mat4_identity() {
     return result;
 }
 
-mat4 mat4_mul(mat4 a, mat4 b) {
+inline mat4 mat4_mul(mat4 a, mat4 b) {
     mat4 result;
     result.m00 = a.m00 * b.m00 + a.m01 * b.m10 + a.m02 * b.m20 + a.m03 * b.m30;
     result.m01 = a.m00 * b.m01 + a.m01 * b.m11 + a.m02 * b.m21 + a.m03 * b.m31;
@@ -304,7 +304,7 @@ mat4 mat4_mul(mat4 a, mat4 b) {
     return result;
 }
 
-mat4 mat4_orthographic(
+inline mat4 mat4_orthographic(
   float left, float right, float bottom, float top, float near, float far) {
     mat4 result = mat4_identity();
 
@@ -323,7 +323,7 @@ mat4 mat4_orthographic(
     return result;
 }
 
-mat4 mat4_perspective(float fov, float aspect, float near, float far) {
+inline mat4 mat4_perspective(float fov, float aspect, float near, float far) {
     mat4 result = {0};
 
     float tan_half_fov = otan(fov * 0.5f);
@@ -336,7 +336,7 @@ mat4 mat4_perspective(float fov, float aspect, float near, float far) {
     return result;
 }
 
-mat4 mat4_look_at(vec3 eye, vec3 center, vec3 up) {
+inline mat4 mat4_look_at(vec3 eye, vec3 center, vec3 up) {
     vec3 f = vec3_normalize_copy(vec3_sub(center, eye));
     vec3 r = vec3_normalize_copy(vec3_cross(f, up));
     vec3 u = vec3_cross(r, f);
@@ -363,7 +363,7 @@ inline float mat4_det3x3(float a, float b, float c, float d, float e, float f,
     return a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g);
 }
 
-mat4 mat4_transpose(mat4 m) {
+inline mat4 mat4_transpose(mat4 m) {
     mat4 result;
     result.m00 = m.m00;
     result.m01 = m.m10;
@@ -384,7 +384,7 @@ mat4 mat4_transpose(mat4 m) {
     return result;
 }
 
-mat4 mat4_inverse(mat4 m) {
+inline mat4 mat4_inverse(mat4 m) {
     // calculate cofactors for each element
     float c00 = mat4_det3x3(
       m.m11, m.m12, m.m13, m.m21, m.m22, m.m23, m.m31, m.m32, m.m33);
@@ -474,7 +474,7 @@ mat4 mat4_inverse(mat4 m) {
     return result;
 }
 
-mat4 mat4_translation(vec3 v) {
+inline mat4 mat4_translation(vec3 v) {
     mat4 result = mat4_identity();
     result.m03 = v.x;
     result.m13 = v.y;
@@ -482,7 +482,7 @@ mat4 mat4_translation(vec3 v) {
     return result;
 }
 
-mat4 mat4_scale(vec3 v) {
+inline mat4 mat4_scale(vec3 v) {
     mat4 result = mat4_identity();
     result.m00 = v.x;
     result.m11 = v.y;
@@ -490,7 +490,7 @@ mat4 mat4_scale(vec3 v) {
     return result;
 }
 
-mat4 mat4_rotation_x(float angle) {
+inline mat4 mat4_rotation_x(float angle) {
     mat4 result = mat4_identity();
     float c = ocos(angle);
     float s = osin(angle);
@@ -501,7 +501,7 @@ mat4 mat4_rotation_x(float angle) {
     return result;
 }
 
-mat4 mat4_rotation_y(float angle) {
+inline mat4 mat4_rotation_y(float angle) {
     mat4 result = mat4_identity();
     float c = ocos(angle);
     float s = osin(angle);
@@ -512,7 +512,7 @@ mat4 mat4_rotation_y(float angle) {
     return result;
 }
 
-mat4 mat4_rotation_z(float angle) {
+inline mat4 mat4_rotation_z(float angle) {
     mat4 result = mat4_identity();
     float c = ocos(angle);
     float s = osin(angle);
@@ -523,31 +523,31 @@ mat4 mat4_rotation_z(float angle) {
     return result;
 }
 
-mat4 mat4_rotation_xyz(float x, float y, float z) {
+inline mat4 mat4_rotation_xyz(float x, float y, float z) {
     return mat4_mul(
       mat4_mul(mat4_rotation_x(x), mat4_rotation_y(y)), mat4_rotation_z(z));
 }
 
-vec3 mat4_forward(mat4 m) {
+inline vec3 mat4_forward(mat4 m) {
     return vec3_normalize_copy(vec3_create(-m.m20, -m.m21, -m.m22));
 }
 
-vec3 mat4_right(mat4 m) {
+inline vec3 mat4_right(mat4 m) {
     return vec3_normalize_copy(vec3_create(m.m00, m.m01, m.m02));
 }
 
-vec3 mat4_up(mat4 m) {
+inline vec3 mat4_up(mat4 m) {
     return vec3_normalize_copy(vec3_create(m.m10, m.m11, m.m12));
 }
 
-vec3 mat4_backward(mat4 m) {
+inline vec3 mat4_backward(mat4 m) {
     return vec3_normalize_copy(vec3_create(m.m20, m.m21, m.m22));
 }
 
-vec3 mat4_left(mat4 m) {
+inline vec3 mat4_left(mat4 m) {
     return vec3_normalize_copy(vec3_create(-m.m00, -m.m01, -m.m02));
 }
 
-vec3 mat4_down(mat4 m) {
+inline vec3 mat4_down(mat4 m) {
     return vec3_normalize_copy(vec3_create(-m.m10, -m.m11, -m.m12));
 }

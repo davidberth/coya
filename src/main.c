@@ -6,6 +6,7 @@
 #include "platform/platform.h"
 #include "renderer/renderer.h"
 #include <stdio.h>
+#include "math/omath.h"
 
 char *get_window_title() {
 #define TITLE_SIZE                                                             \
@@ -51,7 +52,6 @@ int main() {
     }
 
     register_event_handler(EVENT_TYPE_MOUSE_BUTTON, on_mouse_button);
-
     register_event_handler(EVENT_TYPE_INPUT_DOWN, on_input_down);
     register_event_handler(EVENT_TYPE_INPUT_UP, on_input_up);
 
@@ -84,6 +84,8 @@ int main() {
                 elapsed_time = 0.0;
             }
             if (renderer_begin_frame(0.0f)) {
+                renderer_update_global_state(
+                  mat4_identity(), mat4_identity(), vec3_zero(), vec4_one(), 0);
                 renderer_end_frame(0.0f);
             }
         }

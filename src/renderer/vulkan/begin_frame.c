@@ -148,6 +148,23 @@ bool renderer_begin_frame(float delta_time) {
     vulkan_renderpass_begin(command_buffer, &vulkan_context.main_renderpass,
       vulkan_context.swapchain.framebuffers[vulkan_context.image_index].handle);
 
+    return true;
+}
+
+void renderer_update_global_state(mat4 projection, mat4 view,
+  vec3 view_position, vec4 ambient_color, int mode) {
+    VulkanCommandBuffer *command_buffer =
+      &vulkan_context.graphics_command_buffers[vulkan_context.image_index];
+
+    shader_use(&vulkan_context.main_shader);
+
+    vulkan_context.main_shader.global_ubo.projection = projection;
+    vulkan_context.main_shader.global_ubo.view = view;
+
+    // TODO: other uvo properties
+
+    vulkan_object_shader_update_global_state(&vulkan_context.main_shader);
+
     // TODO: This is temporary test code to get us running
     shader_use(&vulkan_context.main_shader);
     VkDeviceSize offsets[1] = {0};
@@ -159,5 +176,4 @@ bool renderer_begin_frame(float delta_time) {
 
     vkCmdDrawIndexed(command_buffer->handle, 6, 1, 0, 0, 0);
     // TODO: end of temporary test code
-    return true;
 }

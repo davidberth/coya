@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vulkan/vulkan.h>
+#include "renderer/types.h"
 
 // image
 typedef struct {
@@ -131,6 +132,12 @@ constexpr int object_shader_stage_count = 2;
 // shader
 typedef struct {
     VulkanShaderStage stages[object_shader_stage_count];
+    GlobalUniformObject global_ubo;
+    VkDescriptorPool global_descriptor_pool;
+    VkDescriptorSetLayout global_descriptor_set_layout;
+    VkDescriptorSet global_descriptor_sets[3];
+    VulkanBuffer global_uniform_buffer;
+
     VulkanPipeline pipeline;
 } VulkanShader;
 
