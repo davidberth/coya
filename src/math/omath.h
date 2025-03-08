@@ -323,15 +323,19 @@ inline mat4 mat4_orthographic(
     return result;
 }
 
-inline mat4 mat4_perspective(float fov, float aspect, float near, float far) {
-    mat4 result = {0};
+inline mat4 mat4_perspective(
+  float fov_radians, float aspect, float near, float far) {
+    mat4 result = mat4_identity();
 
-    float tan_half_fov = otan(fov * 0.5f);
-    result.m00 = 1.0f / (aspect * tan_half_fov);
-    result.m11 = 1.0f / tan_half_fov;
-    result.m22 = (far + near) / (near - far);
+    float f = 1.0f / otan(fov_radians * 0.5f);
+    float nf = 1.0f / (near - far);
+
+    result.m00 = f / aspect;
+    result.m11 = f;
+    result.m22 = (far + near) * nf;
     result.m23 = -1.0f;
-    result.m32 = (2.0f * far * near) / (near - far);
+    result.m32 = 2.0f * far * near * nf;
+    result.m33 = 0.0f;
 
     return result;
 }

@@ -298,24 +298,25 @@ bool renderer_init() {
     }
 
     // TODO: temporary test code
+    constexpr float f = 1.0f;
     constexpr unsigned int vert_count = 4;
     Vertex3D verts[vert_count];
 
-    verts[0].position.x = -0.25f;
-    verts[0].position.y = 0.25f;
-    verts[0].position.z = 0.0f;
+    verts[0].position.x = -0.25f * f;
+    verts[0].position.y = 0.25f * f;
+    verts[0].position.z = 0.0f * f;
 
-    verts[1].position.x = 0.25f;
-    verts[1].position.y = -0.25f;
-    verts[1].position.z = 0.0f;
+    verts[1].position.x = 0.25f * f;
+    verts[1].position.y = -0.25f * f;
+    verts[1].position.z = 0.0f * f;
 
-    verts[2].position.x = -0.25f;
-    verts[2].position.y = -0.25f;
-    verts[2].position.z = 0.0f;
+    verts[2].position.x = -0.25f * f;
+    verts[2].position.y = -0.25f * f;
+    verts[2].position.z = 0.0f * f;
 
-    verts[3].position.x = 0.25f;
-    verts[3].position.y = 0.25f;
-    verts[3].position.z = 0.0f;
+    verts[3].position.x = 0.25f * f;
+    verts[3].position.y = 0.25f * f;
+    verts[3].position.z = 0.0f * f;
 
     constexpr unsigned int index_count = 6;
     unsigned int indices[index_count] = {0, 1, 2, 0, 3, 1};

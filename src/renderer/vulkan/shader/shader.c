@@ -111,7 +111,7 @@ bool shader_create(VulkanShader *out_shader) {
         return false;
     }
 
-    if (!vulkan_buffer_create(sizeof(GlobalUniformObject),
+    if (!vulkan_buffer_create(sizeof(GlobalUniformObject) * 3,
           VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
           VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT |
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
@@ -179,11 +179,8 @@ void vulkan_object_shader_update_global_state(VulkanShader *shader) {
     VkDescriptorSet global_descriptor =
       shader->global_descriptor_sets[image_index];
 
-    vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-      shader->pipeline.layout, 0, 1, &global_descriptor, 0, nullptr);
-
     unsigned int range = sizeof(GlobalUniformObject);
-    unsigned int offset = 0;
+    unsigned int offset = range * image_index;
 
     vulkan_buffer_load_data(
       &shader->global_uniform_buffer, offset, range, 0, &shader->global_ubo);
@@ -204,4 +201,7 @@ void vulkan_object_shader_update_global_state(VulkanShader *shader) {
 
     vkUpdateDescriptorSets(
       vulkan_context.device.logical_device, 1, &descriptor_write, 0, nullptr);
+
+    vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+      shader->pipeline.layout, 0, 1, &global_descriptor, 0, nullptr);
 }

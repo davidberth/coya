@@ -7,6 +7,7 @@
 #include "renderer/renderer.h"
 #include <stdio.h>
 #include "math/omath.h"
+#include "math/types.h"
 
 char *get_window_title() {
 #define TITLE_SIZE                                                             \
@@ -61,6 +62,17 @@ int main() {
         return 1;
     }
 
+    float aspect_ratio = 1280.0f / 720.0f;
+
+    mat4 projection =
+      mat4_perspective(O_DEG2RAD * 45.0f, aspect_ratio, 0.1f, 100.0f);
+
+    // Position camera at (0,0,-3) looking at origin (0,0,0)
+    vec3 eye = vec3_create(0.0f, 0.0f, 3.0f);
+    vec3 center = vec3_zero();
+    vec3 up = vec3_create(0.0f, 1.0f, 0.0f);
+    mat4 view = mat4_look_at(eye, center, up);
+
     while (!platform_should_close()) {
 
         platform_poll_events();
@@ -84,8 +96,9 @@ int main() {
                 elapsed_time = 0.0;
             }
             if (renderer_begin_frame(0.0f)) {
+
                 renderer_update_global_state(
-                  mat4_identity(), mat4_identity(), vec3_zero(), vec4_one(), 0);
+                  projection, view, vec3_zero(), vec4_one(), 0);
                 renderer_end_frame(0.0f);
             }
         }
