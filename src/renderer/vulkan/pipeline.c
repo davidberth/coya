@@ -110,9 +110,17 @@ bool vulkan_graphics_pipeline_create(VulkanRenderpass *renderpass,
     input_assembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     input_assembly.primitiveRestartEnable = VK_FALSE;
 
-    // pipelin layout
+    // pipeline layout
     VkPipelineLayoutCreateInfo pipeline_layout_create_info = {
       VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
+
+    // push constants
+    VkPushConstantRange push_constant;
+    push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    push_constant.offset = 0;
+    push_constant.size = sizeof(mat4) * 2;
+    pipeline_layout_create_info.pushConstantRangeCount = 1;
+    pipeline_layout_create_info.pPushConstantRanges = &push_constant;
 
     // descriptor set layouts
     pipeline_layout_create_info.setLayoutCount = descriptor_set_layout_count;

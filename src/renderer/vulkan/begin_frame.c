@@ -153,8 +153,6 @@ bool renderer_begin_frame(float delta_time) {
 
 void renderer_update_global_state(mat4 projection, mat4 view,
   vec3 view_position, vec4 ambient_color, int mode) {
-    VulkanCommandBuffer *command_buffer =
-      &vulkan_context.graphics_command_buffers[vulkan_context.image_index];
 
     shader_use(&vulkan_context.main_shader);
 
@@ -163,7 +161,14 @@ void renderer_update_global_state(mat4 projection, mat4 view,
 
     // TODO: other uvo properties
 
-    vulkan_object_shader_update_global_state(&vulkan_context.main_shader);
+    vulkan_shader_update_global_state(&vulkan_context.main_shader);
+}
+
+void renderer_update_object(mat4 model) {
+    VulkanCommandBuffer *command_buffer =
+      &vulkan_context.graphics_command_buffers[vulkan_context.image_index];
+
+    vulkan_shader_update_object(&vulkan_context.main_shader, model);
 
     // TODO: This is temporary test code to get us running
     shader_use(&vulkan_context.main_shader);

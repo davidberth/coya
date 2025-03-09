@@ -99,6 +99,15 @@ int main() {
 
                 renderer_update_global_state(
                   projection, view, vec3_zero(), vec4_one(), 0);
+
+                static float angle = 0.0f;
+                angle += 0.0001f;
+                if (angle > O_2PI) {
+                    angle -= O_2PI;
+                }
+                mat4 model = mat4_rotation_z(angle);
+
+                renderer_update_object(model);
                 renderer_end_frame(0.0f);
             }
         }
