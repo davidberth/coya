@@ -101,7 +101,7 @@ int main() {
                   projection, view, vec3_zero(), vec4_one(), 0);
 
                 static float angle = 0.0f;
-                angle += 0.0001f;
+                angle += 0.0005f;
                 if (angle > O_2PI) {
                     angle -= O_2PI;
                 }
@@ -109,6 +109,9 @@ int main() {
 
                 renderer_update_object(model);
                 renderer_end_frame(0.0f);
+
+                // sleep for a short time to avoid excessive CPU usage
+                // platform_sleep(0.01);
             }
         }
     }

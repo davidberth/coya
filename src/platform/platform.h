@@ -8,3 +8,5 @@ void platform_get_window_size(unsigned int *width, unsigned int *height);
 bool platform_is_window_showing();
 char *platform_set_to_root_directory();
 double platform_get_time();
+void platform_sleep(double seconds);
+float platform_get_dpi();

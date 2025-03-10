@@ -17,6 +17,7 @@ void platform_get_window_size(unsigned int *width, unsigned int *height) {
     GetClientRect(window_handle, &rect);
     *width = rect.right - rect.left;
     *height = rect.bottom - rect.top;
+    ilog("Window size width: %d, height: %d", *width, *height);
 }
 
 LRESULT CALLBACK WindowProc(
@@ -148,4 +149,13 @@ void platform_poll_events() {
     }
 }
 
+void platform_sleep(double seconds) { Sleep((DWORD)(seconds * 1000.0f)); }
+
 void platform_cleanup() { DestroyWindow(window_handle); }
+
+float platform_get_dpi() {
+    HDC screen = GetDC(nullptr);
+    float dpi = GetDeviceCaps(screen, LOGPIXELSX);
+    ReleaseDC(nullptr, screen);
+    return dpi;
+}

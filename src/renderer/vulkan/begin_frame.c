@@ -20,6 +20,7 @@ bool recreate_swapchain() {
         dlog("already recreating swapchain");
         return false;
     }
+
     if (vulkan_context.framebuffer_width == 0 ||
         vulkan_context.framebuffer_height == 0) {
         dlog("framebuffer width or height is 0.");
@@ -37,7 +38,9 @@ bool recreate_swapchain() {
     vulkan_device_query_swapchain_support();
     vulkan_device_detect_depth_format();
 
-    ilog("recreating swapchain");
+    ilog("recreating swapchain, framebuffer width: %d, height: %d",
+      vulkan_context.framebuffer_width, vulkan_context.framebuffer_height);
+
     vulkan_swapchain_recreate(vulkan_context.framebuffer_width,
       vulkan_context.framebuffer_height, &vulkan_context.swapchain);
 
