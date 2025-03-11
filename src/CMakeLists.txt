@@ -2,8 +2,10 @@ file(GLOB core_sources "core/*.c")
 file(GLOB input_sources "input/*.c")
 file(GLOB math_sources "math/*.c")
 file(GLOB platform_sources "platform/*.c")
+file(GLOB renderer_sources "renderer/*.c")
+file(GLOB resources_sources "resources/*.c")
 
-set(all_c_sources main.c ${core_sources} ${input_sources} ${math_sources} ${platform_sources})
+set(all_c_sources main.c camera.c ${core_sources} ${input_sources} ${math_sources} ${platform_sources} ${renderer_sources} ${resources_sources})
 
 if(WIN32)
     file(GLOB vulkan_sources "renderer/vulkan/*.c")

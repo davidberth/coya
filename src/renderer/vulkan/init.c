@@ -14,6 +14,7 @@
 #include "framebuffer.h"
 #include "fence.h"
 #include "math/types.h"
+#include "math/omath.h"
 #include "buffer.h"
 
 // shader
@@ -21,6 +22,7 @@
 #include <vulkan/vulkan_core.h>
 
 extern VulkanContext vulkan_context;
+extern RendererGlobalState renderer_state;
 
 constexpr unsigned int max_extensions = 6;
 
@@ -143,6 +145,24 @@ void regenerate_framebuffers(
 }
 
 bool renderer_init() {
+
+    // TODO: graphics API agnostic code should be moved to exposed generic
+    // renderer routines
+    unsigned int width;
+    unsigned int height;
+    platform_get_window_size(&width, &height);
+    float aspect_ratio = (float)width / (float)height;
+    renderer_state.near_clip = 0.1f;
+    renderer_state.far_clip = 100.0f;
+    renderer_state.projection = mat4_perspective(O_DEG2RAD * 45.0f,
+      aspect_ratio, renderer_state.near_clip, renderer_state.far_clip);
+
+    // Position camera at (0,0,-3) looking at origin (0,0,0)
+    vec3 eye = vec3_create(0.0f, 0.0f, 3.0f);
+    vec3 center = vec3_zero();
+    vec3 up = vec3_create(0.0f, 1.0f, 0.0f);
+    renderer_state.view = mat4_look_at(eye, center, up);
+
     vulkan_context.find_memory_index = find_memory_index;
     vulkan_context.allocator = nullptr;
     vulkan_context.graphics_command_buffers = nullptr;

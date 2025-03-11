@@ -185,3 +185,8 @@ typedef struct {
     VkDebugUtilsMessengerEXT debug_messenger;
 #endif
 } VulkanContext;
+
+typedef struct {
+    VulkanImage image;
+    VkSampler sampler;
+} VulkanTextureData;

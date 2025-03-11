@@ -5,9 +5,15 @@
 #include "input/input.h"
 #include "platform/platform.h"
 #include "renderer/renderer.h"
+#include "camera.h"
 #include <stdio.h>
-#include "math/omath.h"
-#include "math/types.h"
+
+typedef struct {
+    mat4 view;
+    Camera camera;
+} GameState;
+
+GameState game_state;
 
 char *get_window_title() {
 #define TITLE_SIZE                                                             \
@@ -62,57 +68,19 @@ int main() {
         return 1;
     }
 
-    float aspect_ratio = 1280.0f / 720.0f;
-
-    mat4 projection =
-      mat4_perspective(O_DEG2RAD * 45.0f, aspect_ratio, 0.1f, 100.0f);
-
-    // Position camera at (0,0,-3) looking at origin (0,0,0)
-    vec3 eye = vec3_create(0.0f, 0.0f, 3.0f);
-    vec3 center = vec3_zero();
-    vec3 up = vec3_create(0.0f, 1.0f, 0.0f);
-    mat4 view = mat4_look_at(eye, center, up);
+    // initialize camera
+    camera_init(&game_state.camera);
 
     while (!platform_should_close()) {
-
         platform_poll_events();
+
+        // update camera and get the view matrix
+        camera_update(&game_state.camera);
+        game_state.view = camera_get_view_matrix(&game_state.camera);
+
         if (platform_is_window_showing()) {
-
-            static double previous_time = 0.0;
-            static int frame_count = 0;
-            static double elapsed_time = 0.0;
-
-            double current_time = platform_get_time();
-            double delta_time = current_time - previous_time;
-            previous_time = current_time;
-
-            frame_count++;
-            elapsed_time += delta_time;
-
-            if (elapsed_time >= 2.0) {
-                double framerate = frame_count / elapsed_time;
-                dlog("framerate: %.2f fps", framerate);
-                frame_count = 0;
-                elapsed_time = 0.0;
-            }
-            if (renderer_begin_frame(0.0f)) {
-
-                renderer_update_global_state(
-                  projection, view, vec3_zero(), vec4_one(), 0);
-
-                static float angle = 0.0f;
-                angle += 0.0005f;
-                if (angle > O_2PI) {
-                    angle -= O_2PI;
-                }
-                mat4 model = mat4_rotation_z(angle);
-
-                renderer_update_object(model);
-                renderer_end_frame(0.0f);
-
-                // sleep for a short time to avoid excessive CPU usage
-                // platform_sleep(0.01);
-            }
+            renderer_set_view(game_state.view);
+            renderer_render_frame();
         }
     }
     renderer_cleanup();

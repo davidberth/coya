@@ -17,6 +17,7 @@ static const char *memory_category_names[] = {
   "Vulkan",
   "Game",
   "SceneGraph",
+  "Texture",
   "String",
 };
 
