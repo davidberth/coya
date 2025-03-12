@@ -22,7 +22,7 @@ void renderer_render_frame() {
         frame_count = 0;
         elapsed_time = 0.0;
     }
-    if (renderer_begin_frame(0.0f)) {
+    if (renderer_begin_frame(delta_time)) {
 
         renderer_update_global_state(renderer_state.projection,
           renderer_state.view, vec3_zero(), vec4_one(), 0);
@@ -35,7 +35,7 @@ void renderer_render_frame() {
         mat4 model = mat4_rotation_z(angle);
 
         renderer_update_object(model);
-        renderer_end_frame(0.0f);
+        renderer_end_frame(delta_time);
 
         // sleep for a short time to avoid excessive CPU and GPU usage
         // platform_sleep(0.01);

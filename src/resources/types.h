@@ -11,3 +11,5 @@ typedef struct {
     unsigned int generation;
     void *internal_data;
 } Texture;
+
+#define INVALID_ID 4294967295U

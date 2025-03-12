@@ -128,6 +128,21 @@ typedef struct {
     VkPipelineLayout layout;
 } VulkanPipeline;
 
+#define VULKAN_OBJECT_MAX_OBJECT_COUNT 1024
+#define VULKAN_OBJECT_SHADER_DESCRIPTOR_COUNT 1
+
+typedef struct VulkanDescriptorState {
+    // one per frame
+    unsigned int generations[3];
+
+} VulkanDescriptorState;
+
+typedef struct {
+    VkDescriptorSet descriptor_sets[3];
+    VulkanDescriptorState
+      descriptor_states[VULKAN_OBJECT_SHADER_DESCRIPTOR_COUNT];
+} VulkanObjectDescriptorState;
+
 constexpr int object_shader_stage_count = 2;
 // shader
 typedef struct {
@@ -143,6 +158,7 @@ typedef struct {
 
 // vulkan context
 typedef struct {
+    float delta_time;
     unsigned int framebuffer_width;
     unsigned int framebuffer_height;
 

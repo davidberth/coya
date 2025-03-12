@@ -16,7 +16,7 @@ void renderer_create_texture(const char *name, bool auto_release,
     out_texture->channel_count = channel_count;
     out_texture->generation = 0;
 
-    // TODO: Use an allocator forr this
+    // TODO: Use an allocator for this
 
     out_texture->internal_data = (VulkanTextureData *)oalloc(
       sizeof(VulkanTextureData), MEMORY_CATEGORY_TEXTURE);

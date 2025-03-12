@@ -172,7 +172,7 @@ void shader_use(VulkanShader *shader) {
       VK_PIPELINE_BIND_POINT_GRAPHICS, &shader->pipeline);
 }
 
-void vulkan_shader_update_global_state(VulkanShader *shader) {
+void vulkan_shader_update_global_state(VulkanShader *shader, float delta_time) {
     unsigned int image_index = vulkan_context.image_index;
     VkCommandBuffer command_buffer =
       vulkan_context.graphics_command_buffers[image_index].handle;
@@ -206,7 +206,8 @@ void vulkan_shader_update_global_state(VulkanShader *shader) {
       shader->pipeline.layout, 0, 1, &global_descriptor, 0, nullptr);
 }
 
-void vulkan_shader_update_object(VulkanShader *shader, mat4 model) {
+void vulkan_shader_update_object(
+  VulkanShader *shader, GeometryRenderData data) {
     unsigned int image_index = vulkan_context.image_index;
     VkCommandBuffer command_buffer =
       vulkan_context.graphics_command_buffers[image_index].handle;
