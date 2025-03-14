@@ -17,13 +17,13 @@ void renderer_create_texture(const char *name, bool auto_release,
     out_texture->generation = INVALID_ID;
 
     // TODO: Use an allocator for this
-
     out_texture->internal_data = (VulkanTextureData *)oalloc(
       sizeof(VulkanTextureData), MEMORY_CATEGORY_TEXTURE);
     VulkanTextureData *data = (VulkanTextureData *)out_texture->internal_data;
     VkDeviceSize image_size = width * height * channel_count;
 
     VkFormat image_format = VK_FORMAT_R8G8B8A8_UNORM;
+
     VkBufferUsageFlags usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
     VkMemoryPropertyFlags memory_prop_flags =
       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
@@ -36,7 +36,7 @@ void renderer_create_texture(const char *name, bool auto_release,
     vulkan_image_create(VK_IMAGE_TYPE_2D, width, height, image_format,
       VK_IMAGE_TILING_OPTIMAL,
       VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT |
-        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+        VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true, VK_IMAGE_ASPECT_COLOR_BIT,
       &data->image);
 
@@ -50,13 +50,13 @@ void renderer_create_texture(const char *name, bool auto_release,
 
     vulkan_image_copy_from_buffer(&data->image, staging.handle, &temp_buffer);
 
-    vulkan_buffer_destroy(&staging);
-
     vulkan_image_transition_layout(&temp_buffer, &data->image, image_format,
       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
       VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     vulkan_command_buffer_end_single_use(pool, &temp_buffer, queue);
+
+    vulkan_buffer_destroy(&staging);
 
     VkSamplerCreateInfo sampler_info = {VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO};
     sampler_info.magFilter = VK_FILTER_LINEAR;

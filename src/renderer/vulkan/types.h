@@ -129,7 +129,7 @@ typedef struct {
 } VulkanPipeline;
 
 #define VULKAN_OBJECT_MAX_OBJECT_COUNT 1024
-#define VULKAN_OBJECT_SHADER_DESCRIPTOR_COUNT 1
+#define VULKAN_OBJECT_SHADER_DESCRIPTOR_COUNT 2
 
 typedef struct VulkanDescriptorState {
     // one per frame
@@ -206,7 +206,7 @@ typedef struct {
     unsigned int geometry_vertex_offset;
     unsigned int geometry_index_offset;
 
-#if defined(_DEBUG)
+#ifndef _DEBUGGGG
     VkDebugUtilsMessengerEXT debug_messenger;
 #endif
 } VulkanContext;

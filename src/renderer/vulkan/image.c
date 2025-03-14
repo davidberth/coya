@@ -137,6 +137,10 @@ void vulkan_image_copy_from_buffer(
     region.imageExtent.height = image->height;
     region.imageExtent.depth = 1;
 
+    region.imageOffset.x = 0;
+    region.imageOffset.y = 0;
+    region.imageOffset.z = 0;
+
     vkCmdCopyBufferToImage(command_buffer->handle, buffer, image->handle,
       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 }

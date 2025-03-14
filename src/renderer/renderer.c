@@ -37,6 +37,7 @@ void renderer_render_frame() {
         GeometryRenderData data = {};
         data.object_id = 0;
         data.model = model;
+        data.textures[0] = &renderer_state.default_texture;
 
         renderer_update_object(data);
         renderer_end_frame(delta_time);

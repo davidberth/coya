@@ -13,7 +13,7 @@ typedef enum {
 typedef struct OpointerNode {
     MemoryCategory category; // memory category of this block
     size_t allocation_size;  // size of the allocation requested by the user
-#ifdef _DEBUG
+#ifndef _DEBUGGG
     const char *file;          // source file where allocation occurred
     int line;                  // line number where allocation occurred
     struct OpointerNode *next; // linked list of active allocations
@@ -32,7 +32,7 @@ void log_memory_report();
 void memory_cleanup();
 
 // macro to automatically capture debug info
-#ifdef _DEBUG
+#ifndef _DEBUGGG
 #define oalloc(size, category) oalloc_debug(size, category, __FILE__, __LINE__)
 #else
 #define oalloc(size, category) oalloc_release(size, category)

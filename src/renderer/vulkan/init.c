@@ -16,6 +16,7 @@
 #include "math/types.h"
 #include "math/omath.h"
 #include "buffer.h"
+#include <stdlib.h>
 
 // shader
 #include "shader/shader.h"
@@ -33,6 +34,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_callback(
 
     if (message_severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
         elog("validation layer: %s", callback_data->pMessage);
+        exit(1);
     } else if (message_severity >=
                VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
         wlog("validation layer: %s", callback_data->pMessage);
@@ -191,7 +193,7 @@ bool renderer_init() {
     unsigned int extension_count = 0;
     get_vulkan_platform_extensions(extensions, &extension_count);
     extensions[extension_count++] = VK_KHR_SURFACE_EXTENSION_NAME;
-#if defined(_DEBUG)
+#ifndef _DEBUGGG
     extensions[extension_count++] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
 #endif
 
@@ -203,7 +205,7 @@ bool renderer_init() {
     create_info.enabledExtensionCount = extension_count;
     create_info.ppEnabledExtensionNames = extensions;
 
-#if defined(_DEBUG)
+#ifndef _DEBUGGG
     ilog("validation layers enabled");
 
     const char *validation_layers[1];
@@ -221,7 +223,7 @@ bool renderer_init() {
       &create_info, vulkan_context.allocator, &vulkan_context.instance));
     ilog("vulkan instance created");
 
-#if defined(_DEBUG)
+#ifndef _DEBUGG
     unsigned int log_serverity =
       VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
       VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
@@ -325,18 +327,26 @@ bool renderer_init() {
     verts[0].position.x = -0.25f * f;
     verts[0].position.y = 0.25f * f;
     verts[0].position.z = 0.0f * f;
+    verts[0].texcoord.x = 0.0f;
+    verts[0].texcoord.y = 1.0f;
 
     verts[1].position.x = 0.25f * f;
     verts[1].position.y = -0.25f * f;
     verts[1].position.z = 0.0f * f;
+    verts[1].texcoord.x = 1.0f;
+    verts[1].texcoord.y = 0.0f;
 
     verts[2].position.x = -0.25f * f;
     verts[2].position.y = -0.25f * f;
     verts[2].position.z = 0.0f * f;
+    verts[2].texcoord.x = 0.0f;
+    verts[2].texcoord.y = 0.0f;
 
     verts[3].position.x = 0.25f * f;
     verts[3].position.y = 0.25f * f;
     verts[3].position.z = 0.0f * f;
+    verts[3].texcoord.x = 1.0f;
+    verts[3].texcoord.y = 1.0f;
 
     constexpr unsigned int index_count = 6;
     unsigned int indices[index_count] = {0, 1, 2, 0, 3, 1};
@@ -355,6 +365,29 @@ bool renderer_init() {
         elog("failed to acquire shader resources");
         return false;
     }
+
+    ilog("Creating default texture");
+    constexpr unsigned int tex_dimension = 256;
+    constexpr unsigned int channels = 4;
+    constexpr unsigned int pixel_count = tex_dimension * tex_dimension;
+    unsigned char pixels[pixel_count * channels];
+
+    // create a checker pattern texture with alternating black and white squares
+    for (unsigned int y = 0; y < tex_dimension; y++) {
+        for (unsigned int x = 0; x < tex_dimension; x++) {
+            unsigned int offset = (y * tex_dimension + x) * channels;
+            unsigned char color = ((x / 32) % 2 == (y / 32) % 2) ? 255 : 0;
+
+            // white or black checkers
+            pixels[offset] = color;     // r
+            pixels[offset + 1] = color; // g
+            pixels[offset + 2] = color; // b
+            pixels[offset + 3] = 255;   // a (fully opaque)
+        }
+    }
+
+    renderer_create_texture("default", false, tex_dimension, tex_dimension,
+      channels, pixels, false, &renderer_state.default_texture);
 
     ilog("vulkan renderer initialized");
     return true;

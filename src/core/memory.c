@@ -8,7 +8,7 @@
 // global array to track total bytes allocated per category
 static size_t memory_totals[MEMORY_CATEGORY_COUNT] = {0};
 
-#ifdef _DEBUG
+#ifndef _DEBUGGG
 // head of active allocations list
 static Opointer *active_allocations = nullptr;
 #endif
@@ -22,7 +22,7 @@ static const char *memory_category_names[] = {
 };
 
 // debug version of allocation that stores file and line info
-#if defined(_DEBUG)
+#ifndef _DEBUGGGG
 void *oalloc_debug(
   size_t size, MemoryCategory category, const char *file, int line) {
     mlog("+ allocating %zu bytes in category %s", size,
@@ -51,7 +51,7 @@ void *oalloc_debug(
 }
 #endif
 
-#if defined(NDEBUG)
+#if defined(NDEBUGGG)
 // release version of allocation without debug info
 void *oalloc_release(size_t size, MemoryCategory category) {
     mlog("+ allocating %zu bytes in category %s", size,
@@ -80,7 +80,7 @@ void ofree(void *pointer) {
     Opointer *opointer_ptr = (Opointer *)((char *)pointer - sizeof(Opointer));
     memory_totals[opointer_ptr->category] -= opointer_ptr->allocation_size;
 
-#ifdef _DEBUG
+#ifndef _DEBUGGGG
     // remove from active allocations list
     if (active_allocations == opointer_ptr) {
         active_allocations = opointer_ptr->next;
@@ -120,7 +120,7 @@ void log_memory_report() {
     mlog(" Total       : %zu bytes", get_total_allocated_memory());
 }
 
-#ifdef _DEBUG
+#ifndef _DEBUGGG
 // debug version of cleanup that reports leak locations
 void memory_cleanup() {
     mlog("checking for memory leaks");

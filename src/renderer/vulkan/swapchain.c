@@ -70,6 +70,11 @@ void create(unsigned width, unsigned height, VulkanSwapchain *swapchain) {
     create_info.imageArrayLayers = 1;
     create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
+    ilog("TODO REMOVE THIS");
+    ilog(
+      "graphics queue index: %d", vulkan_context.device.graphics_queue_index);
+    ilog("present queue index: %d", vulkan_context.device.present_queue_index);
+
     if (vulkan_context.device.graphics_queue_index !=
         vulkan_context.device.present_queue_index) {
         unsigned int queue_family_indices[] = {

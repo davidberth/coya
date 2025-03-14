@@ -10,8 +10,10 @@
 #include "shader/shader.h"
 #include "buffer.h"
 #include <vulkan/vulkan_core.h>
+#include "renderer/renderer.h"
 
 extern VulkanContext vulkan_context;
+extern RendererGlobalState renderer_state;
 
 void renderer_cleanup() {
     vkDeviceWaitIdle(vulkan_context.device.logical_device);
@@ -19,8 +21,11 @@ void renderer_cleanup() {
     vulkan_buffer_destroy(&vulkan_context.main_vertex_buffer);
     vulkan_buffer_destroy(&vulkan_context.main_index_buffer);
 
+    ilog("destroying default texture");
+    renderer_destroy_texture(&renderer_state.default_texture);
+
     shader_destroy(&vulkan_context.main_shader);
-#if defined(_DEBUG)
+#ifndef _DEBUGGG
     dlog("cleaning up the vulkan debugger");
     if (vulkan_context.debug_messenger) {
 

@@ -56,7 +56,7 @@ bool shader_create(VulkanShader *out_shader) {
 
     VkDescriptorPoolCreateInfo global_pool_info = {
       VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
-    global_pool_info.poolSizeCount = 1;
+    global_pool_info.poolSizeCount = 2;
     global_pool_info.pPoolSizes = &global_pool_size;
     global_pool_info.maxSets = vulkan_context.swapchain.image_count;
     vk_check(vkCreateDescriptorPool(vulkan_context.device.logical_device,
@@ -64,8 +64,10 @@ bool shader_create(VulkanShader *out_shader) {
       &out_shader->global_descriptor_pool));
 
     // local descriptors
+    constexpr unsigned int local_sampler_count = 1;
     VkDescriptorType descriptor_types[VULKAN_OBJECT_SHADER_DESCRIPTOR_COUNT] = {
-      VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER};
+      VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,          // binding 0
+      VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER}; // diffuse sampler layout
     VkDescriptorSetLayoutBinding
       bindings[VULKAN_OBJECT_SHADER_DESCRIPTOR_COUNT];
 
@@ -88,13 +90,17 @@ bool shader_create(VulkanShader *out_shader) {
       &out_shader->local_descriptor_set_layout));
 
     // local descriptor pool
-    VkDescriptorPoolSize local_pool_sizes[1];
+    VkDescriptorPoolSize local_pool_sizes[2];
     local_pool_sizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     local_pool_sizes[0].descriptorCount = VULKAN_OBJECT_MAX_OBJECT_COUNT;
+    // second sections used for image samplers
+    local_pool_sizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    local_pool_sizes[1].descriptorCount =
+      local_sampler_count * VULKAN_OBJECT_MAX_OBJECT_COUNT;
 
     VkDescriptorPoolCreateInfo local_pool_info = {
       VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
-    local_pool_info.poolSizeCount = 1;
+    local_pool_info.poolSizeCount = 2;
     local_pool_info.pPoolSizes = local_pool_sizes;
     local_pool_info.maxSets = VULKAN_OBJECT_MAX_OBJECT_COUNT;
     vk_check(vkCreateDescriptorPool(vulkan_context.device.logical_device,
@@ -118,10 +124,11 @@ bool shader_create(VulkanShader *out_shader) {
 
     // attributes
     unsigned int offset = 0;
-    constexpr int attribute_count = 1;
+    constexpr int attribute_count = 2;
     VkVertexInputAttributeDescription attribute_descriptions[attribute_count];
-    VkFormat formats[attribute_count] = {VK_FORMAT_R32G32B32_SFLOAT};
-    unsigned int sizes[attribute_count] = {sizeof(vec3)};
+    VkFormat formats[attribute_count] = {
+      VK_FORMAT_R32G32B32_SFLOAT, VK_FORMAT_R32G32_SFLOAT};
+    unsigned int sizes[attribute_count] = {sizeof(vec3), sizeof(vec2)};
     for (unsigned int i = 0; i < attribute_count; ++i) {
         attribute_descriptions[i].binding = 0;
         attribute_descriptions[i].location = i;
@@ -294,8 +301,8 @@ void vulkan_shader_update_object(
 
     static float accumulator = 0.0f;
     accumulator += vulkan_context.delta_time;
-    float s = (osin(accumulator) * 1.0f) / 2.0f;
-    obo.diffuse_color = vec4_create(s, s, s, 1.0f);
+    float s = (osin(accumulator * 10.0f) / 2.0f) + 0.5f;
+    obo.diffuse_color = vec4_create(s, s, 0.0f, 1.0f);
 
     vulkan_buffer_load_data(
       &shader->local_uniform_buffer, offset, range, 0, &obo);
@@ -303,7 +310,6 @@ void vulkan_shader_update_object(
     // only do this if the descriptor has not yet been updated
     if (object_state->descriptor_states[descriptor_index]
           .generations[image_index] == INVALID_ID) {
-
         VkDescriptorBufferInfo buffer_info;
         buffer_info.buffer = shader->local_uniform_buffer.handle;
         buffer_info.offset = offset;
@@ -323,8 +329,48 @@ void vulkan_shader_update_object(
         object_state->descriptor_states[descriptor_index]
           .generations[image_index] = 1;
     }
-
     ++descriptor_index;
+
+    // TODO: Samplers
+    constexpr unsigned int sampler_count = 1;
+    VkDescriptorImageInfo image_infos[sampler_count];
+    for (unsigned int sampler_index = 0; sampler_index < sampler_count;
+      ++sampler_index) {
+        Texture *t = data.textures[sampler_index];
+        unsigned int *descriptor_generation =
+          &object_state->descriptor_states[descriptor_index]
+             .generations[image_index];
+
+        // check if the descriptor needs updating first
+        if (t && (*descriptor_generation != t->generation ||
+                   *descriptor_generation == INVALID_ID)) {
+            VulkanTextureData *internal_data =
+              (VulkanTextureData *)t->internal_data;
+
+            image_infos[sampler_index].imageLayout =
+              VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            image_infos[sampler_index].imageView = internal_data->image.view;
+            image_infos[sampler_index].sampler = internal_data->sampler;
+
+            VkWriteDescriptorSet descriptor = {
+              VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+            descriptor.dstSet = object_descriptor_set;
+            descriptor.dstBinding = descriptor_index;
+            descriptor.descriptorType =
+              VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            descriptor.descriptorCount = 1;
+            descriptor.pImageInfo = &image_infos[sampler_index];
+
+            descriptor_writes[descriptor_count] = descriptor;
+            ++descriptor_count;
+
+            if (t->generation != INVALID_ID) {
+                *descriptor_generation = t->generation;
+            }
+            ++descriptor_index;
+        }
+    }
+
     if (descriptor_count > 0) {
         vkUpdateDescriptorSets(vulkan_context.device.logical_device,
           descriptor_count, descriptor_writes, 0, nullptr);

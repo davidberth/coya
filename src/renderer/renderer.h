@@ -9,6 +9,8 @@ typedef struct {
     mat4 view;
     float near_clip;
     float far_clip;
+
+    Texture default_texture;
 } RendererGlobalState;
 
 bool renderer_init();
