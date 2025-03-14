@@ -14,7 +14,7 @@ void renderer_create_texture(const char *name, bool auto_release,
     out_texture->width = width;
     out_texture->height = height;
     out_texture->channel_count = channel_count;
-    out_texture->generation = 0;
+    out_texture->generation = INVALID_ID;
 
     // TODO: Use an allocator for this
 
@@ -50,6 +50,8 @@ void renderer_create_texture(const char *name, bool auto_release,
 
     vulkan_image_copy_from_buffer(&data->image, staging.handle, &temp_buffer);
 
+    vulkan_buffer_destroy(&staging);
+
     vulkan_image_transition_layout(&temp_buffer, &data->image, image_format,
       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
       VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -83,6 +85,7 @@ void renderer_create_texture(const char *name, bool auto_release,
 }
 
 void renderer_destroy_texture(Texture *texture) {
+    vkDeviceWaitIdle(vulkan_context.device.logical_device);
     VulkanTextureData *data = (VulkanTextureData *)texture->internal_data;
     vulkan_image_destroy(&data->image);
     vkDestroySampler(vulkan_context.device.logical_device, data->sampler,

@@ -349,7 +349,12 @@ bool renderer_init() {
       vulkan_context.device.graphics_queue, &vulkan_context.main_index_buffer,
       0, sizeof(uint32_t) * index_count, indices);
 
-    // TODO: this is temporary code
+    unsigned int object_id;
+    if (!vulkan_shader_acquire_resources(
+          &vulkan_context.main_shader, &object_id)) {
+        elog("failed to acquire shader resources");
+        return false;
+    }
 
     ilog("vulkan renderer initialized");
     return true;

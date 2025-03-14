@@ -141,7 +141,7 @@ typedef struct {
     VkDescriptorSet descriptor_sets[3];
     VulkanDescriptorState
       descriptor_states[VULKAN_OBJECT_SHADER_DESCRIPTOR_COUNT];
-} VulkanObjectDescriptorState;
+} VulkanShaderObjectState;
 
 constexpr int object_shader_stage_count = 2;
 // shader
@@ -152,6 +152,15 @@ typedef struct {
     VkDescriptorSetLayout global_descriptor_set_layout;
     VkDescriptorSet global_descriptor_sets[3];
     VulkanBuffer global_uniform_buffer;
+
+    VkDescriptorPool local_descriptor_pool;
+    VkDescriptorSetLayout local_descriptor_set_layout;
+    VulkanBuffer local_uniform_buffer;
+    // TODO: manage a free list of some kind here instead
+    unsigned int object_uniform_buffer_index;
+
+    // TODO: make this dynamic
+    VulkanShaderObjectState object_states[VULKAN_OBJECT_MAX_OBJECT_COUNT];
 
     VulkanPipeline pipeline;
 } VulkanShader;

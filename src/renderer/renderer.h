@@ -22,8 +22,8 @@ void renderer_create_texture(const char *name, bool auto_release,
 void renderer_destroy_texture(Texture *texture);
 
 bool renderer_begin_frame(float delta_time);
-void renderer_update_global_state(
-  mat4 projection, mat4 view, vec3 view_position, vec4 ambient_color, int mode);
+void renderer_update_global_state(mat4 projection, mat4 view,
+  vec3 view_position, vec4 ambient_color, int mode, float delta_time);
 bool renderer_end_frame(float delta_time);
 void renderer_update_object(GeometryRenderData data);
 void renderer_on_resize(EventContext event_context);

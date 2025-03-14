@@ -25,7 +25,7 @@ void renderer_render_frame() {
     if (renderer_begin_frame(delta_time)) {
 
         renderer_update_global_state(renderer_state.projection,
-          renderer_state.view, vec3_zero(), vec4_one(), 0);
+          renderer_state.view, vec3_zero(), vec4_one(), 0, delta_time);
 
         static float angle = 0.0f;
         angle += 0.0005f;
@@ -34,7 +34,11 @@ void renderer_render_frame() {
         }
         mat4 model = mat4_rotation_z(angle);
 
-        renderer_update_object(model);
+        GeometryRenderData data = {};
+        data.object_id = 0;
+        data.model = model;
+
+        renderer_update_object(data);
         renderer_end_frame(delta_time);
 
         // sleep for a short time to avoid excessive CPU and GPU usage

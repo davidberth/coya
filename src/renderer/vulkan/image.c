@@ -120,6 +120,27 @@ void vulkan_image_transition_layout(VulkanCommandBuffer *command_buffer,
       destination_stage, 0, 0, NULL, 0, NULL, 1, &barrier);
 }
 
+void vulkan_image_copy_from_buffer(
+  VulkanImage *image, VkBuffer buffer, VulkanCommandBuffer *command_buffer) {
+
+    VkBufferImageCopy region;
+    region.bufferOffset = 0;
+    region.bufferRowLength = 0;
+    region.bufferImageHeight = 0;
+
+    region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    region.imageSubresource.mipLevel = 0;
+    region.imageSubresource.baseArrayLayer = 0;
+    region.imageSubresource.layerCount = 1;
+
+    region.imageExtent.width = image->width;
+    region.imageExtent.height = image->height;
+    region.imageExtent.depth = 1;
+
+    vkCmdCopyBufferToImage(command_buffer->handle, buffer, image->handle,
+      VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+}
+
 void vulkan_image_destroy(VulkanImage *image) {
     if (image->view) {
         vkDestroyImageView(vulkan_context.device.logical_device, image->view,
