@@ -193,7 +193,7 @@ bool renderer_init() {
     unsigned int extension_count = 0;
     get_vulkan_platform_extensions(extensions, &extension_count);
     extensions[extension_count++] = VK_KHR_SURFACE_EXTENSION_NAME;
-#ifndef _DEBUGGG
+#ifdef _DEBUG
     extensions[extension_count++] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
 #endif
 
@@ -205,7 +205,7 @@ bool renderer_init() {
     create_info.enabledExtensionCount = extension_count;
     create_info.ppEnabledExtensionNames = extensions;
 
-#ifndef _DEBUGGG
+#ifdef _DEBUG
     ilog("validation layers enabled");
 
     const char *validation_layers[1];
@@ -223,7 +223,7 @@ bool renderer_init() {
       &create_info, vulkan_context.allocator, &vulkan_context.instance));
     ilog("vulkan instance created");
 
-#ifndef _DEBUGG
+#ifdef _DEBUG
     unsigned int log_serverity =
       VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
       VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
@@ -263,7 +263,7 @@ bool renderer_init() {
     ilog("creating renderpass");
     vulkan_renderpass_create(&vulkan_context.main_renderpass, 0.0f, 0.0f,
       vulkan_context.framebuffer_width, vulkan_context.framebuffer_height, 0.0f,
-      0.0f, 0.2f, 1.0f, 1.0f, 0);
+      0.0f, 0.0f, 1.0f, 1.0f, 0);
 
     // swapchan framebuffers
     vulkan_context.swapchain.framebuffers = (VulkanFramebuffer *)oalloc(

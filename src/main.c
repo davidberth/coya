@@ -17,8 +17,8 @@ GameState game_state;
 
 char *get_window_title() {
 #define TITLE_SIZE                                                             \
-    (sizeof(APPNAME) + sizeof(APPVERSION) + sizeof(RENDERER) +                 \
-      sizeof(PLATFORM) + sizeof(BUILDDATE) + 11)
+    (sizeof(APPNAME) + sizeof(APPVERSION) + sizeof(BUILDDATE) +                \
+      sizeof(RENDERER) + sizeof(PLATFORM) + sizeof(BUILDTYPE) + 8)
 
     static char title[TITLE_SIZE];
     snprintf(title, TITLE_SIZE, "%s %s [%s] %s %s: %s", APPNAME, APPVERSION,
@@ -44,14 +44,15 @@ void on_input_up(EventContext context) {
 
 int main() {
     init_logger();
-    ilog("starting application");
-    ilog("application name: %s", APPNAME);
-    ilog("application version: %s", APPVERSION);
-    ilog("renderer: %s", RENDERER);
-    ilog("platform: %s", PLATFORM);
-    ilog("date: %s", BUILDDATE);
+    wlog("starting application");
+    wlog("application name: %s", APPNAME);
+    wlog("application version: %s", APPVERSION);
+    wlog("build type: %s", BUILDTYPE);
+    wlog("renderer: %s", RENDERER);
+    wlog("platform: %s", PLATFORM);
+    wlog("date: %s", BUILDDATE);
     char *root_directory = platform_set_to_root_directory();
-    ilog("current directory: %s", root_directory);
+    wlog("current directory: %s", root_directory);
 
     if (!platform_init(1000, 600, get_window_title())) {
         elog("window initialization failed");

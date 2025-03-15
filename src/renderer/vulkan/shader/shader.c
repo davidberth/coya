@@ -56,7 +56,7 @@ bool shader_create(VulkanShader *out_shader) {
 
     VkDescriptorPoolCreateInfo global_pool_info = {
       VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
-    global_pool_info.poolSizeCount = 2;
+    global_pool_info.poolSizeCount = 1;
     global_pool_info.pPoolSizes = &global_pool_size;
     global_pool_info.maxSets = vulkan_context.swapchain.image_count;
     vk_check(vkCreateDescriptorPool(vulkan_context.device.logical_device,
@@ -275,6 +275,7 @@ void vulkan_shader_update_global_state(VulkanShader *shader, float delta_time) {
 
 void vulkan_shader_update_object(
   VulkanShader *shader, GeometryRenderData data) {
+
     unsigned int image_index = vulkan_context.image_index;
     VkCommandBuffer command_buffer =
       vulkan_context.graphics_command_buffers[image_index].handle;
@@ -287,7 +288,7 @@ void vulkan_shader_update_object(
     VkDescriptorSet object_descriptor_set =
       object_state->descriptor_sets[image_index];
 
-    // TODO: if this needs and update
+    // TODO: if this needs an update
     VkWriteDescriptorSet
       descriptor_writes[VULKAN_OBJECT_SHADER_DESCRIPTOR_COUNT];
     memset(descriptor_writes, 0,
@@ -307,10 +308,13 @@ void vulkan_shader_update_object(
     vulkan_buffer_load_data(
       &shader->local_uniform_buffer, offset, range, 0, &obo);
 
+    constexpr unsigned int sampler_count = 1;
+    VkDescriptorBufferInfo buffer_info = {0};
+    VkDescriptorImageInfo image_infos[sampler_count] = {0};
+
     // only do this if the descriptor has not yet been updated
     if (object_state->descriptor_states[descriptor_index]
           .generations[image_index] == INVALID_ID) {
-        VkDescriptorBufferInfo buffer_info;
         buffer_info.buffer = shader->local_uniform_buffer.handle;
         buffer_info.offset = offset;
         buffer_info.range = range;
@@ -332,8 +336,7 @@ void vulkan_shader_update_object(
     ++descriptor_index;
 
     // TODO: Samplers
-    constexpr unsigned int sampler_count = 1;
-    VkDescriptorImageInfo image_infos[sampler_count];
+
     for (unsigned int sampler_index = 0; sampler_index < sampler_count;
       ++sampler_index) {
         Texture *t = data.textures[sampler_index];
@@ -367,7 +370,6 @@ void vulkan_shader_update_object(
             if (t->generation != INVALID_ID) {
                 *descriptor_generation = t->generation;
             }
-            ++descriptor_index;
         }
     }
 

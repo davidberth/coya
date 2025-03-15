@@ -25,7 +25,7 @@ void renderer_cleanup() {
     renderer_destroy_texture(&renderer_state.default_texture);
 
     shader_destroy(&vulkan_context.main_shader);
-#ifndef _DEBUGGG
+#ifdef _DEBUG
     dlog("cleaning up the vulkan debugger");
     if (vulkan_context.debug_messenger) {
 

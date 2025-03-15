@@ -206,7 +206,7 @@ typedef struct {
     unsigned int geometry_vertex_offset;
     unsigned int geometry_index_offset;
 
-#ifndef _DEBUGGGG
+#ifdef _DEBUG
     VkDebugUtilsMessengerEXT debug_messenger;
 #endif
 } VulkanContext;

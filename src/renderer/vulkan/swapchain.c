@@ -70,16 +70,13 @@ void create(unsigned width, unsigned height, VulkanSwapchain *swapchain) {
     create_info.imageArrayLayers = 1;
     create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    ilog("TODO REMOVE THIS");
-    ilog(
-      "graphics queue index: %d", vulkan_context.device.graphics_queue_index);
-    ilog("present queue index: %d", vulkan_context.device.present_queue_index);
+    unsigned int queue_family_indices[] = {
+      vulkan_context.device.graphics_queue_index,
+      vulkan_context.device.present_queue_index};
 
     if (vulkan_context.device.graphics_queue_index !=
         vulkan_context.device.present_queue_index) {
-        unsigned int queue_family_indices[] = {
-          vulkan_context.device.graphics_queue_index,
-          vulkan_context.device.present_queue_index};
+
         create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
         create_info.queueFamilyIndexCount = 2;
         create_info.pQueueFamilyIndices = queue_family_indices;
@@ -96,7 +93,7 @@ void create(unsigned width, unsigned height, VulkanSwapchain *swapchain) {
     create_info.oldSwapchain = VK_NULL_HANDLE;
 
     vk_check(vkCreateSwapchainKHR(vulkan_context.device.logical_device,
-      &create_info, nullptr, &swapchain->handle));
+      &create_info, vulkan_context.allocator, &swapchain->handle));
     vulkan_context.current_frame = 0;
     swapchain->image_count = 0;
     vk_check(vkGetSwapchainImagesKHR(vulkan_context.device.logical_device,

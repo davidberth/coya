@@ -7,17 +7,24 @@ if (CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     add_compile_options(-Werror=vla)
 endif()
 
+# Define custom build configuration properties
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release;ReleaseWithDebInfo" CACHE STRING "" FORCE)
 
-# add debugging symbols in release mode
-if(CMAKE_BUILD_TYPE MATCHES "Release")
-  if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-    add_compile_options(-g)
-endif()
-endif()
-# address sanitizer
-if(CMAKE_C_COMPILER_ID MATCHES "Clang")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
-  set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fsanitize=address")
+# Add debugging symbols and sanitizer for ReleaseWithDebInfo configuration
+# Display the current build type
+message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+if(CMAKE_BUILD_TYPE MATCHES "ReleaseWithDebInfo")
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+        add_compile_options(-g -O1)
+        message(STATUS "Building with debug symbols in optimized mode")
+        
+        # Enable Address Sanitizer for Clang in this configuration
+        if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+            add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+            add_link_options(-fsanitize=address)
+            message(STATUS "Address Sanitizer enabled")
+        endif()
+    endif()
 endif()
 
 # variables

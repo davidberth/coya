@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 static struct timeb start;
-#ifndef _DDEBUG
+#ifdef _DEBUG
 static log_level current_level = LOG_INFO;
 #else
 static log_level current_level = LOG_MEMORY;

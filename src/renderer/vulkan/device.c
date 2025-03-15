@@ -223,6 +223,7 @@ bool create_logical_device() {
       vulkan_context.device.graphics_queue_index ==
       vulkan_context.device.transfer_queue_index;
 
+    float queue_priorities[3] = {1.0f, 1.0f, 1.0f};
     unsigned int index_count = 1;
     unsigned int index = 0;
     if (!present_shares_graphics_queue)
@@ -232,12 +233,16 @@ bool create_logical_device() {
     unsigned int *indices = (unsigned int *)oalloc(
       sizeof(unsigned int) * index_count, MEMORY_CATEGORY_VULKAN);
 
-    indices[index++] = vulkan_context.device.graphics_queue_index;
-    if (!present_shares_graphics_queue)
-        indices[index++] = vulkan_context.device.present_queue_index;
-    if (!transfer_shares_graphics_queue)
-        indices[index++] = vulkan_context.device.transfer_queue_index;
-
+    indices[index] = vulkan_context.device.graphics_queue_index;
+    ++index;
+    if (!present_shares_graphics_queue) {
+        indices[index] = vulkan_context.device.present_queue_index;
+        ++index;
+    }
+    if (!transfer_shares_graphics_queue) {
+        indices[index] = vulkan_context.device.transfer_queue_index;
+        ++index;
+    }
     VkDeviceQueueCreateInfo *queue_create_infos =
       (VkDeviceQueueCreateInfo *)oalloc(
         sizeof(VkDeviceQueueCreateInfo) * index_count, MEMORY_CATEGORY_VULKAN);
@@ -251,8 +256,7 @@ bool create_logical_device() {
         }
         queue_create_infos[i].flags = 0;
         queue_create_infos[i].pNext = 0;
-        float queue_priority = 1.0f;
-        queue_create_infos[i].pQueuePriorities = &queue_priority;
+        queue_create_infos[i].pQueuePriorities = queue_priorities;
     }
 
     VkPhysicalDeviceFeatures device_features = {};
