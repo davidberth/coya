@@ -28,8 +28,8 @@ void log_message(
       (current.time - start.time) + (current.millitm - start.millitm) / 1000.0f;
 
     static const char *level_strings[] = {"\033[0;32m[INFO]    ",
-      "\033[0;34m[MEMORY]  ", "[DEBUG]   ", "\033[0;33m[WARNING] ",
-      "\033[0;31m[ERROR]   ", "\033[0;31m[FATAL]   "};
+      "\033[0;34m[MEMORY]  ", "[DEBUG]   ", "\033[0;35m[APP]     ",
+      "\033[0;33m[WARNING] ", "\033[0;31m[ERROR]   ", "\033[0;31m[FATAL]   "};
     printf("%s", level_strings[level]);
 
     size_t file_length = strlen(file);

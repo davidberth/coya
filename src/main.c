@@ -44,15 +44,15 @@ void on_input_up(EventContext context) {
 
 int main() {
     init_logger();
-    wlog("starting application");
-    wlog("application name: %s", APPNAME);
-    wlog("application version: %s", APPVERSION);
-    wlog("build type: %s", BUILDTYPE);
-    wlog("renderer: %s", RENDERER);
-    wlog("platform: %s", PLATFORM);
-    wlog("date: %s", BUILDDATE);
+    alog("starting application");
+    alog("application name: %s", APPNAME);
+    alog("application version: %s", APPVERSION);
+    alog("build type: %s", BUILDTYPE);
+    alog("renderer: %s", RENDERER);
+    alog("platform: %s", PLATFORM);
+    alog("date: %s", BUILDDATE);
     char *root_directory = platform_set_to_root_directory();
-    wlog("current directory: %s", root_directory);
+    alog("current directory: %s", root_directory);
 
     if (!platform_init(1000, 600, get_window_title())) {
         elog("window initialization failed");
