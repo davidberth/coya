@@ -301,8 +301,8 @@ void vulkan_shader_update_object(
     LocalUniformObject obo;
 
     static float accumulator = 0.0f;
-    accumulator += vulkan_context.delta_time;
-    float s = (osin(accumulator * 10.0f) / 2.0f) + 0.5f;
+    accumulator += 0.0003f;
+    float s = (osin(accumulator) / 2.0f) + 0.5f;
     obo.diffuse_color = vec4_create(s, s, 0.0f, 1.0f);
 
     vulkan_buffer_load_data(
