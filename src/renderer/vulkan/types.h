@@ -161,6 +161,7 @@ typedef struct {
 
     // TODO: make this dynamic
     VulkanShaderObjectState object_states[VULKAN_OBJECT_MAX_OBJECT_COUNT];
+    Texture *default_diffuse;
 
     VulkanPipeline pipeline;
 } VulkanShader;

@@ -11,13 +11,16 @@ typedef struct {
     float far_clip;
 
     Texture default_texture;
+    Texture test_diffuse;
 } RendererGlobalState;
 
 bool renderer_init();
-void renderer_cleanup();
 void renderer_render_frame();
 void renderer_set_view(mat4 view);
 
+void create_texture(Texture *t);
+
+bool renderer_init_vulkan();
 void renderer_create_texture(const char *name, bool auto_release,
   unsigned int width, unsigned int height, unsigned short int channel_count,
   const unsigned char *pixels, bool has_alpha, Texture *out_texture);
@@ -29,3 +32,4 @@ void renderer_update_global_state(mat4 projection, mat4 view,
 bool renderer_end_frame(float delta_time);
 void renderer_update_object(GeometryRenderData data);
 void renderer_on_resize(EventContext event_context);
+void renderer_cleanup();

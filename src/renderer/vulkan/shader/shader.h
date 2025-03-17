@@ -2,7 +2,7 @@
 
 #include "renderer/vulkan/types.h"
 
-bool shader_create(VulkanShader *out_shader);
+bool shader_create(Texture *shader_diffuse, VulkanShader *out_shader);
 
 void shader_destroy(VulkanShader *shader);
 

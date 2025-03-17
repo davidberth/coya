@@ -86,12 +86,15 @@ void renderer_create_texture(const char *name, bool auto_release,
 
 void renderer_destroy_texture(Texture *texture) {
     vkDeviceWaitIdle(vulkan_context.device.logical_device);
-    VulkanTextureData *data = (VulkanTextureData *)texture->internal_data;
-    vulkan_image_destroy(&data->image);
-    vkDestroySampler(vulkan_context.device.logical_device, data->sampler,
-      vulkan_context.allocator);
-    data->sampler = nullptr;
 
-    ofree(texture->internal_data);
-    texture->internal_data = nullptr;
+    VulkanTextureData *data = (VulkanTextureData *)texture->internal_data;
+    if (data) {
+        vulkan_image_destroy(&data->image);
+        vkDestroySampler(vulkan_context.device.logical_device, data->sampler,
+          vulkan_context.allocator);
+        data->sampler = nullptr;
+
+        ofree(texture->internal_data);
+        texture->internal_data = nullptr;
+    }
 }

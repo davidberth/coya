@@ -24,6 +24,9 @@ void renderer_cleanup() {
     ilog("destroying default texture");
     renderer_destroy_texture(&renderer_state.default_texture);
 
+    ilog("destroying test diffuse texture");
+    renderer_destroy_texture(&renderer_state.test_diffuse);
+
     shader_destroy(&vulkan_context.main_shader);
 #ifdef _DEBUG
     dlog("cleaning up the vulkan debugger");

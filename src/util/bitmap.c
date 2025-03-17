@@ -1,18 +1,12 @@
 #include "core/logger.h"
+#include "core/memory.h"
+#include "bitmap.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
 
-// define the Bitmap structure
-typedef struct Bitmap {
-    int width;
-    int height;
-    unsigned short bits_per_pixel;
-    unsigned char *data;
-} Bitmap;
-
 // read a bitmap file from a given path
-Bitmap *read_bitmap(const char *path) {
+Bitmap *load_bitmap(const char *path) {
     // open the file in binary read mode
     FILE *file;
     fopen_s(&file, path, "rb");
@@ -44,11 +38,11 @@ Bitmap *read_bitmap(const char *path) {
     int image_size = info_header.biSizeImage;
     if (image_size == 0) {
         image_size =
-            ((info_header.biWidth * info_header.biBitCount + 31) / 32) * 4 *
-            info_header.biHeight;
+          ((info_header.biWidth * info_header.biBitCount + 31) / 32) * 4 *
+          info_header.biHeight;
     }
     // allocate memory for pixel data
-    unsigned char *data = malloc(image_size);
+    unsigned char *data = oalloc(image_size, MEMORY_CATEGORY_TEXTURE);
     if (!data) {
         elog("failed to allocate memory for bitmap data");
         fclose(file);
@@ -59,17 +53,17 @@ Bitmap *read_bitmap(const char *path) {
     // read pixel data
     if (fread(data, 1, image_size, file) != image_size) {
         elog("failed to read bitmap pixel data");
-        free(data);
+        ofree(data);
         fclose(file);
         return nullptr;
     }
     // close the file
     fclose(file);
     // allocate memory for Bitmap structure
-    Bitmap *bitmap = malloc(sizeof(Bitmap));
+    Bitmap *bitmap = oalloc(sizeof(Bitmap), MEMORY_CATEGORY_TEXTURE);
     if (!bitmap) {
         elog("failed to allocate memory for Bitmap structure");
-        free(data);
+        ofree(data);
         return nullptr;
     }
     // set bitmap width
@@ -89,8 +83,8 @@ void free_bitmap(Bitmap *bitmap) {
     // check if bitmap is not nullptr
     if (bitmap) {
         // free the bitmap data
-        free(bitmap->data);
+        ofree(bitmap->data);
         // free the bitmap structure
-        free(bitmap);
+        ofree(bitmap);
     }
 }

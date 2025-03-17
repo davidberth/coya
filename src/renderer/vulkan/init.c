@@ -146,24 +146,7 @@ void regenerate_framebuffers(
     }
 }
 
-bool renderer_init() {
-
-    // TODO: graphics API agnostic code should be moved to exposed generic
-    // renderer routines
-    unsigned int width;
-    unsigned int height;
-    platform_get_window_size(&width, &height);
-    float aspect_ratio = (float)width / (float)height;
-    renderer_state.near_clip = 0.1f;
-    renderer_state.far_clip = 100.0f;
-    renderer_state.projection = mat4_perspective(O_DEG2RAD * 45.0f,
-      aspect_ratio, renderer_state.near_clip, renderer_state.far_clip);
-
-    // Position camera at (0,0,-3) looking at origin (0,0,0)
-    vec3 eye = vec3_create(0.0f, 0.0f, 3.0f);
-    vec3 center = vec3_zero();
-    vec3 up = vec3_create(0.0f, 1.0f, 0.0f);
-    renderer_state.view = mat4_look_at(eye, center, up);
+bool renderer_init_vulkan() {
 
     vulkan_context.find_memory_index = find_memory_index;
     vulkan_context.allocator = nullptr;
@@ -309,7 +292,8 @@ bool renderer_init() {
         vulkan_context.images_in_flight[i] = nullptr;
     }
 
-    if (!shader_create(&vulkan_context.main_shader)) {
+    if (!shader_create(
+          &renderer_state.default_texture, &vulkan_context.main_shader)) {
         elog("failed to create main shader");
         return false;
     }
@@ -388,6 +372,11 @@ bool renderer_init() {
 
     renderer_create_texture("default", false, tex_dimension, tex_dimension,
       channels, pixels, false, &renderer_state.default_texture);
+
+    // default texture is set to invalid id
+    renderer_state.default_texture.generation = INVALID_ID;
+
+    create_texture(&renderer_state.test_diffuse);
 
     ilog("vulkan renderer initialized");
     return true;

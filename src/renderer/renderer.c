@@ -2,8 +2,87 @@
 #include "core/logger.h"
 #include "platform/platform.h"
 #include "math/omath.h"
+#include "core/event.h"
+#include "util/bitmap.h"
+#include "input/input.h"
+#include <string.h>
+#include <stdio.h>
 
 RendererGlobalState renderer_state;
+
+bool load_texture(const char *texture_name, Texture *t) {
+    char *format_str = "resources/textures/%s.%s";
+    char full_file_path[256];
+    unsigned int required_channel_count = 4;
+
+    snprintf(full_file_path, 256, format_str, texture_name, "bmp");
+
+    Texture temp;
+    Bitmap *bm = load_bitmap(full_file_path);
+
+    temp.width = bm->width;
+    temp.height = bm->height;
+    temp.channel_count = bm->bits_per_pixel / 8;
+
+    if (bm->data) {
+        unsigned int current_generation = t->generation;
+        t->generation = INVALID_ID;
+
+        unsigned int total_size =
+          temp.width * temp.height * required_channel_count;
+
+        renderer_create_texture(texture_name, true, temp.width, temp.height,
+          required_channel_count, bm->data, total_size, &temp);
+
+        Texture old = *t;
+        *t = temp;
+
+        renderer_destroy_texture(&old);
+
+        if (current_generation == INVALID_ID) {
+            t->generation = 0;
+        } else {
+            t->generation = current_generation + 1;
+        }
+        free_bitmap(bm);
+        return true;
+    }
+    elog("failed to load texture: %s", texture_name);
+    return false;
+}
+
+void renderer_on_input(EventContext context) {
+    if (context.uint[0] == INPUT_KEY_T) {
+        static unsigned int current_texture = 2;
+        dlog("loading new texture: %d", context.uint[0]);
+
+        const char *name[3] = {"tex1", "tex2", "tex3"};
+        current_texture = (current_texture + 1) % 3;
+
+        load_texture(name[current_texture], &renderer_state.test_diffuse);
+    }
+}
+
+bool renderer_init() {
+    unsigned int width;
+    unsigned int height;
+    platform_get_window_size(&width, &height);
+    float aspect_ratio = (float)width / (float)height;
+    renderer_state.near_clip = 0.1f;
+    renderer_state.far_clip = 100.0f;
+    renderer_state.projection = mat4_perspective(O_DEG2RAD * 45.0f,
+      aspect_ratio, renderer_state.near_clip, renderer_state.far_clip);
+
+    // Position camera at (0,0,-3) looking at origin (0,0,0)
+    vec3 eye = vec3_create(0.0f, 0.0f, 3.0f);
+    vec3 center = vec3_zero();
+    vec3 up = vec3_create(0.0f, 1.0f, 0.0f);
+    renderer_state.view = mat4_look_at(eye, center, up);
+
+    bool vulkan_init_result = renderer_init_vulkan();
+    register_event_handler(EVENT_TYPE_INPUT_DOWN, renderer_on_input);
+    return vulkan_init_result;
+}
 
 void renderer_render_frame() {
     static double previous_time = 0.0;
@@ -37,7 +116,8 @@ void renderer_render_frame() {
         GeometryRenderData data = {};
         data.object_id = 0;
         data.model = model;
-        data.textures[0] = &renderer_state.default_texture;
+        // data.textures[0] = &renderer_state.default_texture;
+        data.textures[0] = &renderer_state.test_diffuse;
 
         renderer_update_object(data);
         renderer_end_frame(delta_time);
@@ -45,6 +125,11 @@ void renderer_render_frame() {
         // sleep for a short time to avoid excessive CPU and GPU usage
         // platform_sleep(0.01);
     }
+}
+
+void create_texture(Texture *t) {
+    memset(t, 0, sizeof(Texture));
+    t->generation = INVALID_ID;
 }
 
 void renderer_set_view(mat4 view) { renderer_state.view = view; }

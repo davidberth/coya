@@ -17,7 +17,8 @@
 
 extern VulkanContext vulkan_context;
 
-bool shader_create(VulkanShader *out_shader) {
+bool shader_create(Texture *default_diffuse, VulkanShader *out_shader) {
+    out_shader->default_diffuse = default_diffuse;
     char stage_type_strs[object_shader_stage_count][5] = {"vert", "frag"};
     VkShaderStageFlagBits stage_types[object_shader_stage_count] = {
       VK_SHADER_STAGE_VERTEX_BIT, VK_SHADER_STAGE_FRAGMENT_BIT};
@@ -335,14 +336,17 @@ void vulkan_shader_update_object(
     }
     ++descriptor_index;
 
-    // TODO: Samplers
-
     for (unsigned int sampler_index = 0; sampler_index < sampler_count;
       ++sampler_index) {
         Texture *t = data.textures[sampler_index];
         unsigned int *descriptor_generation =
           &object_state->descriptor_states[descriptor_index]
              .generations[image_index];
+
+        if (t->generation == INVALID_ID) {
+            t = shader->default_diffuse;
+            *descriptor_generation = INVALID_ID;
+        }
 
         // check if the descriptor needs updating first
         if (t && (*descriptor_generation != t->generation ||
