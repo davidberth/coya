@@ -76,7 +76,7 @@ int main() {
         platform_poll_events();
 
         // update camera and get the view matrix
-        camera_update(&game_state.camera);
+        camera_update(&game_state.camera, renderer_get_delta_time());
         game_state.view = camera_get_view_matrix(&game_state.camera);
 
         if (platform_is_window_showing()) {

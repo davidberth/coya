@@ -11,6 +11,8 @@
 #include "shader/shader.h"
 
 extern VulkanContext vulkan_context;
+extern RendererGlobalState renderer_state;
+
 extern void create_command_buffers();
 extern void regenerate_framebuffers(
   VulkanSwapchain *swapchain, VulkanRenderpass *renderpass);
@@ -41,8 +43,9 @@ bool recreate_swapchain() {
     ilog("recreating swapchain, framebuffer width: %d, height: %d",
       vulkan_context.framebuffer_width, vulkan_context.framebuffer_height);
 
+    bool vsync = renderer_state.vsync;
     vulkan_swapchain_recreate(vulkan_context.framebuffer_width,
-      vulkan_context.framebuffer_height, &vulkan_context.swapchain);
+      vulkan_context.framebuffer_height, &vulkan_context.swapchain, vsync);
 
     // cleanup the swapchain
     for (unsigned int i = 0; i < vulkan_context.swapchain.image_count; ++i) {

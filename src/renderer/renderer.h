@@ -12,6 +12,8 @@ typedef struct {
 
     Texture default_texture;
     Texture test_diffuse;
+
+    bool vsync;
 } RendererGlobalState;
 
 bool renderer_init();
@@ -33,3 +35,5 @@ bool renderer_end_frame(float delta_time);
 void renderer_update_object(GeometryRenderData data);
 void renderer_on_resize(EventContext event_context);
 void renderer_cleanup();
+float renderer_get_delta_time();
+void renderer_toggle_vsync(bool vsync);

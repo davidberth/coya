@@ -68,6 +68,7 @@ bool renderer_init() {
     unsigned int height;
     platform_get_window_size(&width, &height);
     float aspect_ratio = (float)width / (float)height;
+    renderer_state.vsync = true;
     renderer_state.near_clip = 0.1f;
     renderer_state.far_clip = 100.0f;
     renderer_state.projection = mat4_perspective(O_DEG2RAD * 45.0f,
@@ -107,7 +108,7 @@ void renderer_render_frame() {
           renderer_state.view, vec3_zero(), vec4_one(), 0, delta_time);
 
         static float angle = 0.0f;
-        angle += 0.0005f;
+        angle += delta_time;
         if (angle > O_2PI) {
             angle -= O_2PI;
         }
@@ -123,7 +124,7 @@ void renderer_render_frame() {
         renderer_end_frame(delta_time);
 
         // sleep for a short time to avoid excessive CPU and GPU usage
-        // platform_sleep(0.01);
+        // platform_sleep(0.001);
     }
 }
 
@@ -133,3 +134,5 @@ void create_texture(Texture *t) {
 }
 
 void renderer_set_view(mat4 view) { renderer_state.view = view; }
+
+void enable_vsync(bool vsync) { renderer_state.vsync = vsync; }

@@ -9,10 +9,10 @@ void camera_init(Camera *camera) {
     camera->position = vec3_create(0.0f, 0.0f, camera->radius);
 }
 
-void camera_update(Camera *camera) {
+void camera_update(Camera *camera, double delta_time) {
     // rotation speeds (in radians per frame)
-    float rotation_speed = 0.001f;
-    float zoom_speed = 0.003f;
+    float rotation_speed = delta_time;
+    float zoom_speed = delta_time * 4.0f;
 
     // handle arrow key inputs for camera rotation
     if (get_key_state(INPUT_KEY_LEFT)) {

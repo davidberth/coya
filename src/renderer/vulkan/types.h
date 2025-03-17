@@ -168,7 +168,7 @@ typedef struct {
 
 // vulkan context
 typedef struct {
-    float delta_time;
+    double delta_time;
     unsigned int framebuffer_width;
     unsigned int framebuffer_height;
 

@@ -8,10 +8,13 @@
 #include "core/util.h"
 #include "core/memory.h"
 #include <vulkan/vulkan_core.h>
+#include "renderer/renderer.h"
 
 extern VulkanContext vulkan_context;
+extern RendererGlobalState renderer_state;
 
-void create(unsigned width, unsigned height, VulkanSwapchain *swapchain) {
+void swapchain_create(
+  unsigned width, unsigned height, VulkanSwapchain *swapchain, bool vsync) {
     ilog("creating swapchain");
 
     VkExtent2D swapchain_extent = {width, height};
@@ -37,10 +40,13 @@ void create(unsigned width, unsigned height, VulkanSwapchain *swapchain) {
     }
 
     VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR;
-    for (unsigned int i = 0; i < support_info->present_mode_count; i++) {
-        if (support_info->present_modes[i] == VK_PRESENT_MODE_MAILBOX_KHR) {
-            present_mode = VK_PRESENT_MODE_MAILBOX_KHR;
-            break;
+
+    if (!vsync) {
+        for (unsigned int i = 0; i < support_info->present_mode_count; i++) {
+            if (support_info->present_modes[i] == VK_PRESENT_MODE_MAILBOX_KHR) {
+                present_mode = VK_PRESENT_MODE_MAILBOX_KHR;
+                break;
+            }
         }
     }
 
@@ -163,15 +169,15 @@ void destroy(VulkanSwapchain *swapchain) {
     swapchain->views = 0;
 }
 
-void vulkan_swapchain_create(
-  unsigned int width, unsigned int height, VulkanSwapchain *out_swapchain) {
-    create(width, height, out_swapchain);
+void vulkan_swapchain_create(unsigned int width, unsigned int height,
+  VulkanSwapchain *out_swapchain, bool vsync) {
+    swapchain_create(width, height, out_swapchain, vsync);
 }
 
-void vulkan_swapchain_recreate(
-  unsigned int width, unsigned int height, VulkanSwapchain *swapchain) {
+void vulkan_swapchain_recreate(unsigned int width, unsigned int height,
+  VulkanSwapchain *swapchain, bool vsync) {
     destroy(swapchain);
-    create(width, height, swapchain);
+    swapchain_create(width, height, swapchain, vsync);
 }
 
 void vulkan_swapchain_destroy(VulkanSwapchain *swapchain) {
@@ -186,8 +192,9 @@ bool vulkan_swapchain_acquire_next_image_index(VulkanSwapchain *swapchain,
       image_available_semaphore, fence, out_image_index);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        bool vsync = renderer_state.vsync;
         vulkan_swapchain_recreate(vulkan_context.framebuffer_width,
-          vulkan_context.framebuffer_height, swapchain);
+          vulkan_context.framebuffer_height, swapchain, vsync);
         return false;
     } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
         flog("failed to acquire next image index");
@@ -208,8 +215,9 @@ void vulkan_swapchain_present(VulkanSwapchain *swapchain,
 
     VkResult result = vkQueuePresentKHR(present_queue, &present_info);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+        bool vsync = renderer_state.vsync;
         vulkan_swapchain_recreate(vulkan_context.framebuffer_width,
-          vulkan_context.framebuffer_height, swapchain);
+          vulkan_context.framebuffer_height, swapchain, vsync);
     } else if (result != VK_SUCCESS) {
         flog("failed to present swap chain image");
     }

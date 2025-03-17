@@ -240,8 +240,9 @@ bool renderer_init_vulkan() {
         return false;
     }
 
+    bool vsync = renderer_state.vsync;
     vulkan_swapchain_create(vulkan_context.framebuffer_width,
-      vulkan_context.framebuffer_height, &vulkan_context.swapchain);
+      vulkan_context.framebuffer_height, &vulkan_context.swapchain, vsync);
 
     ilog("creating renderpass");
     vulkan_renderpass_create(&vulkan_context.main_renderpass, 0.0f, 0.0f,

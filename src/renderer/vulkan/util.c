@@ -1,4 +1,7 @@
 #include <vulkan/vulkan.h>
+#include "renderer/vulkan/types.h"
+
+extern VulkanContext vulkan_context;
 
 bool vulkan_result_is_success(VkResult result) {
     switch (result) {
@@ -18,3 +21,5 @@ bool vulkan_result_is_success(VkResult result) {
     }
     return false;
 }
+
+float renderer_get_delta_time() { return vulkan_context.delta_time; }
