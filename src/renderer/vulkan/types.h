@@ -80,6 +80,7 @@ typedef struct {
     VkQueue graphics_queue;
     VkQueue present_queue;
     VkQueue transfer_queue;
+    bool supports_device_local_host_visible;
 } VulkanDevice;
 
 // swapchain
