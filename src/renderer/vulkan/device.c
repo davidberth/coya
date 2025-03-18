@@ -141,6 +141,21 @@ bool select_physical_device() {
         }
     }
 
+    bool supports_device_local_host_visible = false;
+    for (unsigned int i = 0; i < memory.memoryTypeCount; i++) {
+        if (((memory.memoryTypes[i].propertyFlags &
+               VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) != 0) &&
+            ((memory.memoryTypes[i].propertyFlags &
+               VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) != 0)) {
+            supports_device_local_host_visible = true;
+            break;
+        }
+    }
+    ilog("device supports device local host visible: %s",
+      supports_device_local_host_visible ? "true" : "false");
+
+    vulkan_context.device.supports_device_local_host_visible =
+      supports_device_local_host_visible;
     vulkan_context.device.memory = memory;
 
     unsigned int queue_family_count = 0;
