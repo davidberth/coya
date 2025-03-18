@@ -8,6 +8,7 @@ typedef enum {
     INPUT_KEY_LEFT = 0x27,
     INPUT_KEY_RIGHT = 0x25,
     INPUT_KEY_T = 0x54,
+    INPUT_KEY_V = 0x56,
 } KeyMap;
 
 bool get_key_state(KeyMap key);

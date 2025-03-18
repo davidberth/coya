@@ -4,7 +4,7 @@
 
 void camera_init(Camera *camera) {
     // initialize camera position at a distance from origin
-    camera->radius = 5.0f;
+    camera->radius = 1.0f;
     camera->euler = vec3_zero();
     camera->position = vec3_create(0.0f, 0.0f, camera->radius);
 }
@@ -39,8 +39,8 @@ void camera_update(Camera *camera, double delta_time) {
     // handle zoom in/out with W/S keys
     if (get_key_state('W')) {
         camera->radius -= zoom_speed;
-        if (camera->radius < 1.0f) {
-            camera->radius = 1.0f;
+        if (camera->radius < 0.5f) {
+            camera->radius = 0.5f;
         }
     }
     if (get_key_state('S')) {

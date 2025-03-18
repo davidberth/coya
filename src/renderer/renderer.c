@@ -3,36 +3,38 @@
 #include "platform/platform.h"
 #include "math/omath.h"
 #include "core/event.h"
-#include "util/bitmap.h"
+#include "util/ppm.h"
 #include "input/input.h"
 #include <string.h>
 #include <stdio.h>
 
 RendererGlobalState renderer_state;
 
+void enable_vsync(bool vsync) { renderer_state.vsync = vsync; }
+
 bool load_texture(const char *texture_name, Texture *t) {
     char *format_str = "resources/textures/%s.%s";
     char full_file_path[256];
     unsigned int required_channel_count = 4;
 
-    snprintf(full_file_path, 256, format_str, texture_name, "bmp");
+    snprintf(full_file_path, 256, format_str, texture_name, "ppm");
 
     Texture temp;
-    Bitmap *bm = load_bitmap(full_file_path);
+    PPM *ppm = load_ppm(full_file_path);
 
-    temp.width = bm->width;
-    temp.height = bm->height;
-    temp.channel_count = bm->bits_per_pixel / 8;
+    temp.width = ppm->width;
+    temp.height = ppm->height;
+    temp.channel_count = 4;
 
-    if (bm->data) {
+    if (ppm->pixels) {
         unsigned int current_generation = t->generation;
         t->generation = INVALID_ID;
 
         unsigned int total_size =
           temp.width * temp.height * required_channel_count;
 
-        renderer_create_texture(texture_name, true, temp.width, temp.height,
-          required_channel_count, bm->data, total_size, &temp);
+        renderer_create_texture(texture_name, false, temp.width, temp.height,
+          required_channel_count, ppm->pixels, total_size, &temp);
 
         Texture old = *t;
         *t = temp;
@@ -44,7 +46,7 @@ bool load_texture(const char *texture_name, Texture *t) {
         } else {
             t->generation = current_generation + 1;
         }
-        free_bitmap(bm);
+        free_ppm(ppm);
         return true;
     }
     elog("failed to load texture: %s", texture_name);
@@ -60,6 +62,19 @@ void renderer_on_input(EventContext context) {
         current_texture = (current_texture + 1) % 3;
 
         load_texture(name[current_texture], &renderer_state.test_diffuse);
+    } else if (context.uint[0] == INPUT_KEY_V) {
+
+        enable_vsync(!renderer_state.vsync);
+        dlog("vsync: %s", renderer_state.vsync ? "enabled" : "disabled");
+
+        unsigned int width;
+        unsigned int height;
+        platform_get_window_size(&width, &height);
+        // trigger a resize to force a swapchain recreation
+        EventContext context;
+        context.uint[0] = width;
+        context.uint[1] = height;
+        trigger_event(EVENT_TYPE_RESIZE, context);
     }
 }
 
@@ -117,7 +132,6 @@ void renderer_render_frame() {
         GeometryRenderData data = {};
         data.object_id = 0;
         data.model = model;
-        // data.textures[0] = &renderer_state.default_texture;
         data.textures[0] = &renderer_state.test_diffuse;
 
         renderer_update_object(data);
@@ -134,5 +148,3 @@ void create_texture(Texture *t) {
 }
 
 void renderer_set_view(mat4 view) { renderer_state.view = view; }
-
-void enable_vsync(bool vsync) { renderer_state.vsync = vsync; }

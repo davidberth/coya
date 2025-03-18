@@ -43,4 +43,5 @@ void input_init() {
     input_keys[INPUT_KEY_LEFT] = true;
     input_keys[INPUT_KEY_RIGHT] = true;
     input_keys[INPUT_KEY_T] = true;
+    input_keys[INPUT_KEY_V] = true;
 }

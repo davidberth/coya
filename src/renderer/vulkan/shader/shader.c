@@ -304,8 +304,8 @@ void vulkan_shader_update_object(
 
     static float accumulator = 0.0f;
     accumulator += 0.0003f;
-    float s = (osin(accumulator) / 2.0f) + 0.5f;
-    obo.diffuse_color = vec4_create(s, s, 0.0f, 1.0f);
+    float s = (osin(accumulator) / 3.0f) + 0.6f;
+    obo.diffuse_color = vec4_create(s, s, s, 1.0f);
 
     vulkan_buffer_load_data(
       &shader->local_uniform_buffer, offset, range, 0, &obo);
