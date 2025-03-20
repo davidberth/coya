@@ -3,7 +3,7 @@
 #include "core/event.h"
 #include "renderer/renderer.h"
 #include "platform/platform.h"
-#include "renderer/vulkan/shader/shader.h"
+#include "shader/material_shader.h"
 #include "platform/util.h"
 #include "types.h"
 #include "util.h"
@@ -14,12 +14,9 @@
 #include "framebuffer.h"
 #include "fence.h"
 #include "math/types.h"
-#include "math/omath.h"
 #include "buffer.h"
 #include <stdlib.h>
 
-// shader
-#include "shader/shader.h"
 #include <vulkan/vulkan_core.h>
 
 extern VulkanContext vulkan_context;
@@ -293,7 +290,7 @@ bool renderer_init_vulkan() {
         vulkan_context.images_in_flight[i] = nullptr;
     }
 
-    if (!shader_create(
+    if (!material_shader_create(
           &renderer_state.default_texture, &vulkan_context.main_shader)) {
         elog("failed to create main shader");
         return false;
@@ -345,7 +342,7 @@ bool renderer_init_vulkan() {
       0, sizeof(uint32_t) * index_count, indices);
 
     unsigned int object_id;
-    if (!vulkan_shader_acquire_resources(
+    if (!material_shader_acquire_resources(
           &vulkan_context.main_shader, &object_id)) {
         elog("failed to acquire shader resources");
         return false;

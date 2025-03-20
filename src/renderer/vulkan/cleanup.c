@@ -7,7 +7,7 @@
 #include "command_buffer.h"
 #include "framebuffer.h"
 #include "fence.h"
-#include "shader/shader.h"
+#include "shader/material_shader.h"
 #include "buffer.h"
 #include <vulkan/vulkan_core.h>
 #include "renderer/renderer.h"
@@ -27,7 +27,7 @@ void renderer_cleanup() {
     ilog("destroying test diffuse texture");
     renderer_destroy_texture(&renderer_state.test_diffuse);
 
-    shader_destroy(&vulkan_context.main_shader);
+    material_shader_destroy(&vulkan_context.main_shader);
 #ifdef _DEBUG
     dlog("cleaning up the vulkan debugger");
     if (vulkan_context.debug_messenger) {

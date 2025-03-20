@@ -8,7 +8,7 @@
 #include "renderpass.h"
 #include "framebuffer.h"
 #include "util.h"
-#include "shader/shader.h"
+#include "shader/material_shader.h"
 
 extern VulkanContext vulkan_context;
 extern RendererGlobalState renderer_state;
@@ -118,6 +118,7 @@ bool renderer_begin_frame(float delta_time) {
         return false;
     }
 
+    /*
     if (vulkan_context.images_in_flight[vulkan_context.image_index] != NULL) {
         if (!vulkan_fence_wait(
               vulkan_context.images_in_flight[vulkan_context.image_index],
@@ -126,6 +127,7 @@ bool renderer_begin_frame(float delta_time) {
             return false;
         }
     }
+    */
 
     VulkanCommandBuffer *command_buffer =
       &vulkan_context.graphics_command_buffers[vulkan_context.image_index];
@@ -161,24 +163,25 @@ bool renderer_begin_frame(float delta_time) {
 void renderer_update_global_state(mat4 projection, mat4 view,
   vec3 view_position, vec4 ambient_color, int mode, float delta_time) {
 
-    shader_use(&vulkan_context.main_shader);
+    material_shader_use(&vulkan_context.main_shader);
 
     vulkan_context.main_shader.global_ubo.projection = projection;
     vulkan_context.main_shader.global_ubo.view = view;
 
     // TODO: other uvo properties
 
-    vulkan_shader_update_global_state(&vulkan_context.main_shader, delta_time);
+    material_shader_update_global_state(
+      &vulkan_context.main_shader, delta_time);
 }
 
 void renderer_update_object(GeometryRenderData data) {
     VulkanCommandBuffer *command_buffer =
       &vulkan_context.graphics_command_buffers[vulkan_context.image_index];
 
-    vulkan_shader_update_object(&vulkan_context.main_shader, data);
+    material_shader_update_object(&vulkan_context.main_shader, data);
 
     // TODO: This is temporary test code to get us running
-    shader_use(&vulkan_context.main_shader);
+    material_shader_use(&vulkan_context.main_shader);
     VkDeviceSize offsets[1] = {0};
     vkCmdBindVertexBuffers(command_buffer->handle, 0, 1,
       &vulkan_context.main_vertex_buffer.handle, (VkDeviceSize *)offsets);

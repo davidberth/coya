@@ -1,4 +1,4 @@
-#include "shader.h"
+#include "material_shader.h"
 #include "core/logger.h"
 #include "renderer/types.h"
 #include "renderer/vulkan/types.h"
@@ -17,7 +17,8 @@
 
 extern VulkanContext vulkan_context;
 
-bool shader_create(Texture *default_diffuse, VulkanShader *out_shader) {
+bool material_shader_create(
+  Texture *default_diffuse, VulkanShader *out_shader) {
     out_shader->default_diffuse = default_diffuse;
     char stage_type_strs[object_shader_stage_count][5] = {"vert", "frag"};
     VkShaderStageFlagBits stage_types[object_shader_stage_count] = {
@@ -204,7 +205,7 @@ bool shader_create(Texture *default_diffuse, VulkanShader *out_shader) {
     return true;
 }
 
-void shader_destroy(VulkanShader *shader) {
+void material_shader_destroy(VulkanShader *shader) {
     VkDevice logical_device = vulkan_context.device.logical_device;
 
     vkDestroyDescriptorPool(
@@ -236,13 +237,13 @@ void shader_destroy(VulkanShader *shader) {
     }
 }
 
-void shader_use(VulkanShader *shader) {
+void material_shader_use(VulkanShader *shader) {
     unsigned int image_index = vulkan_context.image_index;
     vulkan_pipeline_bind(&vulkan_context.graphics_command_buffers[image_index],
       VK_PIPELINE_BIND_POINT_GRAPHICS, &shader->pipeline);
 }
 
-void vulkan_shader_update_global_state(
+void material_shader_update_global_state(
   VulkanShader *shader, double delta_time) {
     unsigned int image_index = vulkan_context.image_index;
     VkCommandBuffer command_buffer =
@@ -277,7 +278,7 @@ void vulkan_shader_update_global_state(
       shader->pipeline.layout, 0, 1, &global_descriptor, 0, nullptr);
 }
 
-void vulkan_shader_update_object(
+void material_shader_update_object(
   VulkanShader *shader, GeometryRenderData data) {
 
     unsigned int image_index = vulkan_context.image_index;
@@ -389,7 +390,7 @@ void vulkan_shader_update_object(
       shader->pipeline.layout, 1, 1, &object_descriptor_set, 0, nullptr);
 }
 
-bool vulkan_shader_acquire_resources(
+bool material_shader_acquire_resources(
   VulkanShader *shader, unsigned int *out_object_id) {
 
     // TODO: manage these properly with a free list
@@ -421,7 +422,7 @@ bool vulkan_shader_acquire_resources(
     return true;
 }
 
-void vulkan_shader_release_resources(
+void material_shader_release_resources(
   VulkanShader *shader, unsigned int object_id) {
 
     VulkanShaderObjectState *object_state = &shader->object_states[object_id];

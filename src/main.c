@@ -1,11 +1,11 @@
-﻿#include "configure/constants.h"
+﻿#include "camera.h"
+#include "configure/constants.h"
 #include "core/event.h"
 #include "core/logger.h"
 #include "core/memory.h"
 #include "input/input.h"
 #include "platform/platform.h"
 #include "renderer/renderer.h"
-#include "camera.h"
 #include <stdio.h>
 
 typedef struct {

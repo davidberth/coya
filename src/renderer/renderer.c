@@ -136,9 +136,6 @@ void renderer_render_frame() {
 
         renderer_update_object(data);
         renderer_end_frame(delta_time);
-
-        // sleep for a short time to avoid excessive CPU and GPU usage
-        // platform_sleep(0.001);
     }
 }
 
